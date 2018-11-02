@@ -10,7 +10,7 @@ Created on Tue Oct 30 14:59:02 2018
 # -----------------------------------------------------------
 from read_img_tool import getDataSet
 
-datasetRootPath = "trainSet"  # 存放各个类别图像数据文件夹的根目录
+datasetRootPath = "../../dataset/trainSet"  # 存放各个类别图像数据文件夹的根目录
 aimSize = (100, 100, 3)       # 设置缩放大小（拿到的数据集将会是统一的这个尺寸）
 categoryNum = 2               # 你需要人工确认待识别类别的数量
 x_dataset, y_dataset = getDataSet(datasetRootPath, aimSize)
@@ -29,7 +29,7 @@ from keras.utils import to_categorical
 import numpy as np
 
 """
-categoryNum = 2 
+categoryNum = 2
 x_dataset = np.random.random((100, 100, 100, 3))
 y_dataset = np.random.randint(2, size=(100, 1))
 """
