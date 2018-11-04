@@ -111,41 +111,53 @@ def buildCNN(blockNum):
 # -----------------------------------------------------------
 # 构建并训练不同深度的CNN模型
 # -----------------------------------------------------------
-
 blockNumList = range(3, 7)
+accessResult = []
+val_accessResult = []
 batchSize = 32
-epochNum = 100
+epochNum = 3
 
-plt.title('Result Analysis')
-plt.xlabel('epoches')
-plt.ylabel('accuracy')
 for blockNum in blockNumList:
     print('---------------------')
     print('start training the ' + str(blockNum) + ' block CNN model')
-
+    
     model = buildCNN(blockNum)
-
+    
     history = LossHistory()
-    model.fit(x_train, y_train, batch_size=batchSize, epochs=epochNum,
-              validation_data=(x_test,y_test), callbacks=[history])
-
+    model.fit(x_train[:100], y_train[:100], batch_size=batchSize, epochs=epochNum, 
+              validation_data=(x_test[:100],y_test[:100]), callbacks=[history])
+    
     print('\ntraining finished')
-
-    # 评价模型与可视化
+    
+    # 评价模型与可视化  
     print('final accuracy on validation set')
     score = model.evaluate(x_test, y_test, batch_size=32)
     print(score)
-
+    
     print('\nvalidation accuracy record')
     print(history.val_acces)
-
-    plt.title('Result Analysis')
-    #plt.plot([x for x in range(1, len(history.val_acces) + 1)], history.val_acces,
-    #         label='validation accuracy of ' + str(blockNum) + ' blocks CNN')
-    plt.plot([x for x in range(1, len(history.acces) + 1)], history.acces,
-              label='training accuracy of ' + str(blockNum) + ' blocks CNN')
+    
+    accessResult.append(history.acces)
+    val_accessResult.append(history.val_acces)
     print('---------------------\n')
 
 
-plt.legend() # 显示图例
+subplt1 = plt.subplot(121)
+subplt2 = plt.subplot(122)
+subplt1.set_title('training accuracy')
+subplt2.set_title('validation accuracy')
+subplt1.set_xlabel('epoches')
+subplt2.set_xlabel('epoches')
+
+for blockNum in blockNumList:
+    s1 = subplt1.plot([x for x in range(1, len(accessResult[blockNum-3]) + 1)],
+                       accessResult[blockNum-3],
+                       label = str(blockNum) + ' blocks CNN')
+plt.legend()
+for blockNum in blockNumList:
+    s2 = subplt2.plot([x for x in range(1, len(val_accessResult[blockNum-3]) + 1)],
+                       val_accessResult[blockNum-3],
+                       label = str(blockNum) + ' blocks CNN')
+plt.legend()
 plt.show()
+
