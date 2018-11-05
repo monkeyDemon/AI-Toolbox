@@ -124,8 +124,8 @@ for blockNum in blockNumList:
     model = buildCNN(blockNum)
     
     history = LossHistory()
-    model.fit(x_train[:100], y_train[:100], batch_size=batchSize, epochs=epochNum, 
-              validation_data=(x_test[:100],y_test[:100]), callbacks=[history])
+    model.fit(x_train, y_train, batch_size=batchSize, epochs=epochNum, 
+              validation_data=(x_test,y_test), callbacks=[history])
     
     print('\ntraining finished')
     
