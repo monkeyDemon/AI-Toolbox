@@ -20,8 +20,8 @@ CNN调参练习version5：
 # 基本参数
 # -----------------------------------------------------------
 
-trainSetRootPath = '../../data/train/'     # 训练集根目录路径，该路径下应该分布着存放各个类别图像数据的文件夹
-validSetRootPath = '../../data/validation/'# 验证集根目录路径，该路径下应该分布着存放各个类别图像数据的文件夹
+trainSetRootPath = '../../../dataset/trainSetExample'     # 训练集根目录路径，该路径下应该分布着存放各个类别图像数据的文件夹
+validSetRootPath = '../../../dataset/validSetExample'# 验证集根目录路径，该路径下应该分布着存放各个类别图像数据的文件夹
 weightfileSavePath = "weights.h5"          # 权重存放路径
 targetSize = (224, 224, 3)                 # 设置缩放大小（拿到的数据集将会是统一的这个尺寸）
 categoryNum = 3                            # 你需要人工确认待识别类别的数量
