@@ -2,9 +2,11 @@
 """
 Created on Mon Nov 12 16:58:15 2018
 
-selective search 调用demo1
-读取一张图片，调用开源库selectivesearch的方法得到目标建议框并展示
-使用前需要先看装开源库selectivesearch
+selective search demo1
+
+read one image, call the open source library selectivesearch's api
+get the region proposal boxes and display
+you need to install python library selectivesearch first
 
 
 Selective Search paper:
@@ -27,7 +29,7 @@ import matplotlib.patches as mpatches
 
 
 """
-# 一个最简单的调用示例
+# the simplest api call method is here: 
 img = skimage.data.astronaut()
 print(type(img))
 
@@ -41,15 +43,16 @@ print(regions[:10])
 def main():
 
     # loading astronaut image
-    img = skimage.data.astronaut()
+    #img = skimage.data.astronaut()
     
-    # loading our image
-    #img = io.imread('./cake.jpg')
+    # loading your own image
+    img = io.imread('./sheep.jpg')
 
     # perform selective search
     img_lbl, regions = selectivesearch.selective_search(
-        img, scale=500, sigma=0.8, min_size=10)
-    
+        img, scale=100, sigma=0.8, min_size=10)
+    print(regions[0])
+
     """
     parameter explanation
     sigma:
@@ -71,8 +74,8 @@ def main():
         # excluding same rectangle (with different segments)
         if r['rect'] in candidates:
             continue
-        # excluding regions smaller than 2000 pixels
-        if r['size'] < 2000:
+        # excluding regions lager than 1600 pixels
+        if r['size'] > 1600 or r['size'] < 50:
             continue
         # distorted rects
         x, y, w, h = r['rect']
@@ -86,7 +89,7 @@ def main():
     fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(6, 6))
     ax.imshow(img)
     for x, y, w, h in candidates:
-        print(x, y, w, h)
+        #print(x, y, w, h)
         rect = mpatches.Rectangle(
             (x, y), w, h, fill=False, edgecolor='red', linewidth=1)
         ax.add_patch(rect)
