@@ -2,31 +2,38 @@
 """
 Created on Mon Nov 12 20:36:01 2018
 
-selective search 调用demo2
-读取一张图片，调用opencv实现的selectivesearch算法得到目标建议框并展示
+selective search demo2
+
+read one image
+call the opencv implementation of the selectivesearch algorithm
+get the region proposal boxes and display
 
 Selective Search paper:
 J.R.R. Uijlings, et al, Selective Search for Object Recognition, IJCV 2012
 
 @author: zyb_as
 """
-
+import skimage.data
+from skimage import io
 import sys
 import cv2
 
 if __name__ == '__main__':
-
-    img_path = './cake.jpg'
-    mode = 'f'    # Switch to fast but low recall Selective Search method
-    # mode = 'q'   # Switch to high recall but slow Selective Search method
+    # read image
+    # loading astronaut image
+    im = skimage.data.astronaut()
     
+    # you can also load your own image
+    #img_path = './sheep.jpg'
+    #im = cv2.imread(img_path)
+    
+    mode = 'f'    # Switch to fast but low recall Selective Search method
+    # mode = 'q'   # Switch to high recall but slow Selective Search method    
     
     # speed-up using multithreads
     cv2.setUseOptimized(True);
     cv2.setNumThreads(4);
-
-    # read image
-    im = cv2.imread(img_path)
+    
     # resize image
     newHeight = 200
     newWidth = int(im.shape[1]*200/im.shape[0])
