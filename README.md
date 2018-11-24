@@ -17,5 +17,30 @@ All sample images used are for research purposes only and will be deleted immedi
 
  |  |  |  |  |  |
   | ------ | ------ | ------ | ------ | ------ |
- | FFT for image encryption | SIFT for match | None |None |None |
- | ![fft](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/algorithm_image/fft.png) | ![sift](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/algorithm_image/sift.png) | ![Alt](https://avatar.csdn.net/7/7/B/1_ralf_hx163com.jpg) |![Alt](https://avatar.csdn.net/7/7/B/1_ralf_hx163com.jpg) |![Alt](https://avatar.csdn.net/7/7/B/1_ralf_hx163com.jpg) |
+ | FFT for image encryption | SIFT for match | selective search |None |None |
+ | ![fft](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/algorithm_image/fft.png) | ![sift](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/algorithm_image/sift.png) | ![sift](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/algorithm_image/selectivesearch.png) |![Alt](https://avatar.csdn.net/7/7/B/1_ralf_hx163com.jpg) |![Alt](https://avatar.csdn.net/7/7/B/1_ralf_hx163com.jpg) |
+
+
+ ## Algorithm checklist
+
+Is this AI-Toolbox useful for you?
+
+Here is a list shows which algorithms are included in our toolbox, you can check.
+
+- CNN
+  * basic exercise
+    + [parameter adjustment exercise(keras)](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/classical_CNN_implement/CNN_parameterAdjusting_practice)
+  * classification
+    + VGG
+    + GoogleNet
+    + ResNet
+  * object detection
+    + RCNN
+    + YOLO
+- digital image processing
+  * feature point detection
+    + [SIFT](https://github.com/monkeyDemon/AI-Toolbox/tree/master/image%20processing%20ToolBox/feature_point_detection/sift)
+  * frequency domain method
+    + [FFT](https://github.com/monkeyDemon/AI-Toolbox/tree/master/image%20processing%20ToolBox/frequency_domain_method)
+  * image segmentation
+    + [selective search](https://github.com/monkeyDemon/AI-Toolbox/tree/master/image%20processing%20ToolBox/image_segmentation/selective_search)
