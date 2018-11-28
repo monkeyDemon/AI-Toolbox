@@ -7,7 +7,7 @@ data annotation tool
 this is a demo to demonstrate how to implement a data annotation program
 
 how to use?
-first, type the save path in the text box
+first, the save path has shown in the text box(temporarily does not support modification)
 then, we click 'start' button to select a directory
 after that, all the images in the specified directory will be load one by one
 use the numeric keys to label image samples
@@ -22,7 +22,7 @@ import Tkinter
 from Tkinter import Button, Canvas, Entry, Frame
 import tkFileDialog
 import tkMessageBox
-from Tix import Control, ComboBox 
+from Tix import Control 
 from PIL import Image, ImageTk
 import os
 
@@ -165,18 +165,6 @@ class DataAnnotationWindow(object):
         return img_list
 
 
-"""
-# 在画布中绘制指定的图片
-img_path_list=['./food/[长眠] (462).jpg', './food/411.jpg', './food/[长眠] (461).jpg']
-img_path_list = [path.decode('utf-8') for path in img_path_list]
-imgs_list = [Image.open(path).resize((200,200)) for path in img_path_list]
-imgs_list= [ImageTk.PhotoImage(img) for img in imgs_list]
-for i in range(len(imgs_list)):
-   cv.create_image((0,200*i), anchor=Tkinter.NW, image=imgs_list[i]) 
-   # 这里要注意，不要使用临时变量对create_image函数的imgae参数赋值
-   # 因为Canvas仅仅是维护一个引用，当创建的PhotoImage实例被销毁时，显示会出问题
-"""
-
 if __name__ == '__main__':
     data_annotation_tool = DataAnnotationWindow()
-    Tkinter.mainloop()  #运行这个GUI应用
+    Tkinter.mainloop()  # run GUI
