@@ -10,7 +10,9 @@ how to use?
 first, the save path has shown in the text box(temporarily does not support modification)
 then, we click 'start' button to select a directory
 after that, all the images in the specified directory will be load one by one
-use the numeric keys to label image samples
+click the category button(for example 'Dog' and 'Cat') to label image samples
+click the 'NumericUpDown Control' to jump to specified image 
+click the 'QUIT' button to quit
 
 
 python version: Python 2.7
