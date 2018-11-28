@@ -110,7 +110,7 @@ class DataAnnotationWindow(object):
 
     def _showImage(self, ev=None):
         if self.has_select_path:
-            if self.num_count['value'] == -1:
+            if int(self.num_count['value']) == -1:
                 # create init image(a black background)
                 self.img = Image.new("RGB", (self.img_Wid, self.img_Hei), (0,0,0))
                 self.photo_img = ImageTk.PhotoImage(self.img)
