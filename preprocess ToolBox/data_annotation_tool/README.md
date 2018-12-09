@@ -6,6 +6,8 @@ here has a few data annotation demos in this directory
 
 `data_annotation_tool.py`
 
+`data_annotation_too2.py`
+
 `image_select_tool.py`
 
 ## A singal GUI demo
@@ -38,6 +40,33 @@ click the 'QUIT' button to quit
 ![fft](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/readme_image/data_annotation_1.png)
 
 ![fft](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/readme_image/data_annotation_2.png)
+
+## data annotation tool2
+
+`data_annotation_tool2.py` is also a data annotation tool, some improvements have been made on the basis tool data_annotation_tool.py, and make it more efficient.
+
+And data annotation tool2 is more suitable for such a scene:
+
+We have a lot of images to do data annotation, but the distribution of data
+is extremely uneven, most of the samples are belong to one category, and a few
+of samples are belong to another. We hope to separate the two categories more efficiently.
+
+how to use?
+
+first, the save path has shown in the text box(temporarily does not support modification)
+
+then, we click 'start' button to select a directory
+
+after that, all the images in the specified directory will be load one by one
+
+press 'space' or click the 'Pass' button to mark it as category A
+
+press 'd' or click the 'Remove' button to mark it as category B
+
+click the 'QUIT' button to quit
+
+Compared with the tool `data_annotation_tool2.py`, you can now completely remove the mouse operation, and most of the time, you simply press the space bar repeatedly, the operation is much more efficient.
+
 
 ## A image select tool
 
