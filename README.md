@@ -29,11 +29,11 @@ Here is a list shows which algorithms are included in our toolbox, you can check
 
 - CNN
   * basic exercise
-    + [parameter adjustment exercise(keras)](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/classical_CNN_implement/CNN_parameterAdjusting_practice)
+    + [parameter adjustment exercise(keras)](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/image_classification/parameterAdjusting_practice)
   * classification
     + VGG
     + GoogleNet
-    + ResNet
+    + [ResNet](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/image_classification/resNet_template)
   * object detection
     + RCNN
     + YOLO
