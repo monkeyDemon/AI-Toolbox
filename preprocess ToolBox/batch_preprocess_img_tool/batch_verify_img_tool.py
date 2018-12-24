@@ -16,18 +16,35 @@ import cv2
 import os
 import numpy
 import shutil
+import warnings
 
 
-src_dir = './need_valid'
+src_dir = 'the src dir need to be varify'
 dst_dir = './unreadable_imgs'
+
+# the file type that we concerned about(the file with other types will be remove)
+concern_file_type = ['jpg', 'JPG', 'png', 'PNG', 'bmp', 'BMP', 'jpeg', 'JPEG'] 
+
+# raise the warning as an exception
+warnings.filterwarnings('error') 
 
 if os.path.exists(dst_dir) == False:
     os.mkdir(dst_dir)
 
-for file_name in os.listdir(src_dir):
-    src_file = os.path.join(src_dir, file_name)
-    img = cv2.imread(src_file)
-    if type(img) != numpy.ndarray:
-        print(file_name, type(img))
+for root, dirs, files in os.walk(src_dir):
+    for file_name in files:
+        src_file = os.path.join(root, file_name)
         dst_file = os.path.join(dst_dir, file_name)
-        shutil.move(src_file, dst_file)
+        suffix = file_name.split('.')[-1]
+        if suffix not in concern_file_type:
+            print('not concern file type!', src_file)
+            shutil.move(src_file, dst_file)
+            continue
+        try:
+            img = cv2.imread(src_file)
+            if type(img) != numpy.ndarray:
+                print('type error!', file_name)
+                shutil.move(src_file, dst_file)
+        except Warning:
+            print('A warning raised!', file_name)
+            shutil.move(src_file, dst_file)
