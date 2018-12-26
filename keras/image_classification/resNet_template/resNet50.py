@@ -71,8 +71,8 @@ from keras.callbacks import Callback
 """
 
 # TODO: set basic configuration parameters
-weight_load_path = './weights/resnet50_weights_tf_paste.h5' 
-weight_save_path = './weights/resnet50_weights_tf_paste.h5'  
+weight_load_path = './weights/resnet50_weights_tf.h5' 
+weight_save_path = './weights/resnet50_weights_tf.h5'  
 train_set_path = 'train_root_path/'
 valid_set_path = 'validation_root_path/'
 record_save_path = './records'
