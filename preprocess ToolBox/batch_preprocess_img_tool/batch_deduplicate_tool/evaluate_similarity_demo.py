@@ -82,14 +82,14 @@ md5_str = md5.hexdigest()
 print(md5_str)
 
 # Loading an image file into memory and calculating it's hash value.
-image_file = open('./deduplicate_test_img/test1.jpg', 'rb').read()
+image_file = open('./deduplicate_test_img/test1_1.jpg', 'rb').read()
 md5 = hashlib.md5()
 md5.update(image_file)
 md5_img = md5.hexdigest()
 print(md5_img)
 
 # Loading a very similar image into memory and calculating it's hash value.
-image_file2 = open('./deduplicate_test_img/test2.jpg', 'rb').read()
+image_file2 = open('./deduplicate_test_img/test1_2.jpg', 'rb').read()
 md5 = hashlib.md5()
 md5.update(image_file2)
 md5_img = md5.hexdigest()

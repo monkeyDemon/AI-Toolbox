@@ -66,7 +66,7 @@ def hamming_distance(str1, str2):
 
 
 # TODO: set parameters
-check_dir = 'E:/ansheng/porn_detect/dataset/chengrenkatong_annotation_result/recover_Pass'
+check_dir = 'your directory need to deduplicate'
 remove_dir = './remove' # specify the directory to save the duplicate images
 mode = 'equal'          # 'equal' or 'similar'
 threshold = 3           # this parameter takes effect only when mode is 'similar'
