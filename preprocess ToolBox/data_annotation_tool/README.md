@@ -8,6 +8,8 @@ here has a few data annotation demos in this directory
 
 `data_annotation_too2.py`
 
+`data_annotation_too3.py`
+
 `image_select_tool.py`
 
 ## A singal GUI demo
@@ -67,6 +69,29 @@ click the 'QUIT' button to quit
 
 Compared with the tool `data_annotation_tool2.py`, you can now completely remove the mouse operation, and most of the time, you simply press the space bar repeatedly, the operation is much more efficient.
 
+## data annotation tool3
+
+`data_annotation_tool3.py` is also a data annotation tool, can handle situation for multiple categories.
+
+Base on data_annotation_tool.py and data_annotation_tool2.py, we optimized the
+visualization style so that images with large aspect ratios can also be
+displayed properly.
+
+how to use?
+
+first, the save path has shown in the text box(temporarily does not support modification)
+
+then, we click 'start' button to select a directory
+
+after that, all the images in the specified directory will be load one by one
+
+press 'q' or click the 'Category 1' button to mark it as category 1
+
+press 'w' or click the 'Category 2' button to mark it as category 2
+
+press 'e' or click the 'Category 3' button to mark it as category 3
+
+click the 'QUIT' button to quit
 
 ## A image select tool
 
