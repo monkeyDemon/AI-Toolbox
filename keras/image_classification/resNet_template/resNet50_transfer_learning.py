@@ -14,6 +14,8 @@ please use resNet50.py
 - [Deep Residual Learning for Image Recognition] (https://arxiv.org/abs/1512.03385) 
 
 # weights download address for classic CNN: 'https://github.com/fchollet/deep-learning-models/releases/'
+
+@author: zyb_as
 """
 
 import os
@@ -37,6 +39,10 @@ from keras.callbacks import ReduceLROnPlateau
 from keras.callbacks import Callback 
 
 
+
+#-----------------------------------------------------------------------------------------
+#--------------------------------parameter defination-------------------------------------
+#-----------------------------------------------------------------------------------------
 """
 # Before applying this demo to your new classification problem
 # please check the settings of the following parameters.
@@ -48,7 +54,7 @@ from keras.callbacks import Callback
 # train_set_path     the root path of the training set. Each category should correspond to a folder
 # valid_set_path     the root path of the validation set. Each category should correspond to a folder
 # record_save_path   the path to save the training record file
-# category_num        the category num of the classification problem
+# category_num       the category num of the classification problem
 """
 # TODO: set basic configuration parameters
 weight_load_path = './weights/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
@@ -193,7 +199,7 @@ model.summary()
 #-----------------------------------------------------------------------------------------
 #---------------------------------transfer learning---------------------------------------
 #-----------------------------------------------------------------------------------------
-# TODO:
+# TODO: choose training parameters
 epoch_num = 200
 
 # TODO: choose a optimizer
