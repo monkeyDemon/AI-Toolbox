@@ -67,7 +67,7 @@ from keras.callbacks import Callback
 # train_set_path     the root path of the training set. Each category should correspond to a folder
 # valid_set_path     the root path of the validation set. Each category should correspond to a folder
 # record_save_path   the path to save the training record file
-# category_num        the category num of the classification problem
+# category_num       the category num of the classification problem
 """
 
 # TODO: set basic configuration parameters
@@ -198,7 +198,7 @@ fill_mode = 'nearest'           # mode list: nearest, constant, reflect, wrap
 val_datagen = ImageDataGenerator(rescale=1/255.) 
 
 train_generator = train_datagen.flow_from_directory( 
-train_set_path,                 # the path of traning set(each directory should correspond to one category)
+train_set_path, # the path of traning set(each directory should correspond to one category)
 target_size=(224, 224),         
 batch_size=batch_size,         
 class_mode='categorical') 
