@@ -34,6 +34,7 @@ Here is a list shows which algorithms are included in our toolbox, you can check
     + VGG
     + GoogleNet
     + [ResNet](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/image_classification/resNet_template)
+    + [DenseNet](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/image_classification/denseNet_template)
   * object detection
     + RCNN
     + YOLO
