@@ -22,7 +22,7 @@ import shutil
 import warnings
 
 
-def dhash(image, hash_size = 8):
+def dhash(image, hash_size = 12):
     # Grayscale and shrink the image in one step.
     image = image.convert('L')
     image = image.resize((hash_size + 1, hash_size), Image.ANTIALIAS)
@@ -66,44 +66,46 @@ def hamming_distance(str1, str2):
 
 
 # TODO: set parameters
-check_dir = 'your directory need to deduplicate'
-remove_dir = './remove' # specify the directory to save the duplicate images
+check_dir = 'the directory to deduplicate'
+duplicate_dir = './duplicate_dir' # specify the directory to save the duplicate images
 mode = 'equal'          # 'equal' or 'similar'
 threshold = 3           # this parameter takes effect only when mode is 'similar'
-concern_file_type = ['jpg', 'JPG', 'png', 'PNG', 'bmp', 'BMP', 
-                    'jpeg', 'JPEG'] # the file with other types will be ignore
 
-if os.path.exists(remove_dir) == False:
-    os.mkdir(remove_dir)
+if os.path.exists(duplicate_dir) == False:
+    os.mkdir(duplicate_dir)
 
 if mode == 'equal':
     hash_set = set()
     for root, dirs, files in os.walk(check_dir):
         for file_name in files:
-            suffix = file_name.split('.')[-1]
-            if suffix not in concern_file_type:
-                continue
             src_file = os.path.join(root, file_name)
-            dst_file = os.path.join(remove_dir, file_name)
+            dst_file = os.path.join(duplicate_dir, file_name)
             img = Image.open(src_file)
-            dhash_img = dhash(img)
+            try:
+              	dhash_img = dhash(img)
+            except:
+                print('some error occur!')
+                shutil.move(src_file, dst_file)
+                continue
             if dhash_img in hash_set:
                 print('find duplicate!', file_name)
                 shutil.move(src_file, dst_file)
             else:
                 hash_set.add(dhash_img)
+    print("finish")
 elif mode == 'similar':
     hash_list = []
     for root, dirs, files in os.walk(check_dir):
         for file_name in files:
-            print('*', end='')
-            suffix = file_name.split('.')[-1]
-            if suffix not in concern_file_type:
-                continue
             src_file = os.path.join(root, file_name)
-            dst_file = os.path.join(remove_dir, file_name)
+            dst_file = os.path.join(duplicate_dir, file_name)
             img = Image.open(src_file)
-            dhash_cur_img = dhash(img)
+            try:
+                dhash_cur_img = dhash(img)
+            except:
+                print('some error occur!')
+                shutil.move(src_file, dst_file)
+                continue
             duplicate = False
             for tar_dhash in hash_list:
                 distance = hamming_distance(dhash_cur_img, tar_dhash)
@@ -114,5 +116,7 @@ elif mode == 'similar':
                     break
             if duplicate == False:
                 hash_list.append(dhash_cur_img)
+    print("finish")
 else:
     print('please reset the mode parameter!')
+
