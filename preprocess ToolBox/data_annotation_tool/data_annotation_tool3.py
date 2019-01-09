@@ -29,19 +29,18 @@ python version: Python 2.7
 
 @author: zyb_as
 """
-
+import os
+import sys
+import shutil
 import Tkinter  
 from Tkinter import Button, Canvas, Entry, Frame
 import tkFileDialog
 import tkMessageBox
 from Tix import Control 
 from PIL import Image, ImageTk
-import os
-import shutil
 
-
-
-
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 
 
@@ -117,7 +116,7 @@ class DataAnnotationWindow(object):
                         activebackground='blue', bg='white', fg='black')  
         self.btn_category3.pack(side = Tkinter.TOP, pady=10)
         
-        #NumericUpDown控件
+        #NumericUpDown
         self.num_count = Control(self.frame,integer=True, max=-1, min=-1, value=-1, step=1,
                                  label='current Image:', command=self._showImage)
         self.num_count.label.config(font='Helvetica -14 bold')
@@ -157,10 +156,19 @@ class DataAnnotationWindow(object):
     def _labelButtonClick(self, label):
         cur_idx = int(self.num_count['value'])
         if cur_idx != -1:
-            # save cur image's annotation result
+            # get cur image's annotation label and file name
             catgory_idx = self.categoryList.index(label)
-            save_path = self.category_savepath_list[catgory_idx]
             cur_img_name = self.img_list[cur_idx].split('\\')[-1]
+            
+            # check if cur_img_name exist(undo last annotation operation)
+            for cur_dir in self.category_savepath_list:
+                for file in os.listdir(cur_dir):
+                    if file == cur_img_name:
+                        os.remove(os.path.join(cur_dir, file))
+                        break
+            
+            # save cur image's annotation result
+            save_path = self.category_savepath_list[catgory_idx]
             save_path = os.path.join(save_path, cur_img_name)
             src_path = os.path.join(self.img_path, cur_img_name)
             shutil.copy(src_path, save_path)
@@ -189,14 +197,12 @@ class DataAnnotationWindow(object):
 
     def _getImagList(self):
         img_list = []
-        img_suffix = ['jpg', 'png', 'jpeg', 'bmp']
         for root, dirs, files in os.walk(self.img_path):
             for file_name in files:
-                suffix = file_name.split('.')[-1]
-                if suffix in img_suffix:
-                    cur_img_path = os.path.join(root, file_name)
-                    img_list.append(cur_img_path)
+                cur_img_path = os.path.join(root, file_name)
+                img_list.append(cur_img_path)
         return img_list
+    
     
     def _loadImage(self, img_path):
         img_back = Image.new("RGB", (self.img_Wid, self.img_Hei), (0,0,0))
@@ -224,6 +230,8 @@ class DataAnnotationWindow(object):
                     y = y_offset
                     img_back.putpixel((x, y), resize_img.getpixel((x_offset, y_offset)))
         return img_back
+
+
 
 if __name__ == '__main__':
     data_annotation_tool = DataAnnotationWindow()
