@@ -6,7 +6,6 @@ face recognize api
 @author: zyb_as
 """
 import os
-import copy
 import numpy as np
 from scipy import misc
 import tensorflow as tf

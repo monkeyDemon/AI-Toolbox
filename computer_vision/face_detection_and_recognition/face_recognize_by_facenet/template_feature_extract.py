@@ -13,13 +13,12 @@ this script generate the feature embeddings of target people's faces
 and save it in './template/template_face_embeddings.npy'.
 
 moreover, this script also generate the target peoples name correspond to
-the the face embeddings file, save in './template/target_people_names.npy'.
+the face embeddings file, save in './template/target_people_names.npy'.
 
 @author: zyb_as
 """
 
 import os
-import cv2
 import numpy as np
 from scipy import misc
 from face_recognize_api import face_recognizer
