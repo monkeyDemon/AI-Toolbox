@@ -8,7 +8,7 @@ In our work, we use this program to detect the user's head sculptur which infrin
 
 Here are part of the illegal images we detected.
 
-![fft](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/readme_image/face_recognize/chenduxiu_hit.jpg)
+![chenduxiu](https://raw.githubusercontent.com/wiki/monkeyDemon/AI-Toolbox/readme_image/face_recognize/chenduxiu.png)
 
 # Usage
 
