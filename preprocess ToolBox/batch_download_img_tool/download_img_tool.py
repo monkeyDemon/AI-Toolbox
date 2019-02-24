@@ -66,12 +66,12 @@ def _get_img_by_url(url, save_dir):
     #response = requests.get(url,timeout=0.1,proxies=proxies)
     pic_name = url.split('/')[-1]
     response = requests.get(url,timeout=1)
-    print(pic_name,'  OK')
     
     # save image
     with open(save_dir + pic_name, 'wb') as fd:
         for chunk in response.iter_content(128):  # iter_content saving while downloading
             fd.write(chunk)    
+    print(pic_name,'  OK')
 
 
 def download_from_txt(url_file, save_dir, splitter = '\t', fields_num = 1, url_field_idx = 0):    
@@ -92,14 +92,13 @@ def download_from_txt(url_file, save_dir, splitter = '\t', fields_num = 1, url_f
         if len(item) == fields_num: 
             try:
                 url = item[url_field_idx]
-                url = 'http://img.zuoyebang.cc/' + url.rstrip('\n')
+                url = url.rstrip('\n')
                 # rstrip() delete the specified character at the end of the string (default is a space)
                 print(url)
                 _get_img_by_url(url, save_dir)  
-                break
             except:
                 failure_count += 1
-                failed_urls.append(url.rstrip())
+                failed_urls.append(url.rstrip)
     print("\nfailed record:")
     print(failure_count)
     print(failed_urls)
