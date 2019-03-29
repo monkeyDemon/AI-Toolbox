@@ -1,13 +1,13 @@
 # Usage example:
 
-# Easiest way:
+## Easiest way:
 ```
 from keyframes_extract_diff import KeyFrames
 keyframes = KeyFrames() 
 keyframes.extract("pikachu.mp4") 
 ```
 
-# Complicated Way
+## Complicated Way
 There are three modes and you can choose any of them. The default mode is USE_LOCAL_MAXIMA
 ```
 from keyframes_extract_diff import KeyFrames
