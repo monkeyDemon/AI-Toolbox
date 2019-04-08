@@ -1,7 +1,11 @@
 """
 Created on Sun Feb 24 14:49:10 2019
 
-A demo that use tf.image to do data augmentation
+demo to use tensorflow api do data augmentation
+
+this demo will simulate practical training processes
+we load image data from tfrecord file batch by batch
+and then do data augmentation on each batch images
 
 @author: zyb_as
 """
