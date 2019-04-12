@@ -84,11 +84,10 @@ def image_to_tfexample(image_data, image_format, height, width, class_id):
       'image/channel': int64_feature(3)
   }))
 
-def image_to_tfexample2(image_data, class_id, shape):
+def image_to_tfexample2(image_data, class_id):
   return tf.train.Example(features=tf.train.Features(feature={
       'image/encoded': bytes_feature(image_data),
       'image/class/label': int64_feature(class_id),
-      'image/shape': int64_list_feature(shape),
   }))
 
 def write_label_file(labels_to_class_names, dataset_dir,

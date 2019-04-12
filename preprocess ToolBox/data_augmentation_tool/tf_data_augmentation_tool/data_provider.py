@@ -19,17 +19,12 @@ def datset_input_fn(filename, batch_size, epochs_num):
         keys_to_features={
             'image/class/label':tf.FixedLenFeature(shape=(), dtype=tf.int64),
             'image/encoded':tf.FixedLenFeature(shape=(), dtype=tf.string),  
-            'image/shape':tf.FixedLenFeature(shape=(3,), dtype=tf.int64)
         }
         parsed = tf.parse_single_example(record, keys_to_features)
-        # get image raw data
-        image = tf.decode_raw(parsed["image/encoded"], tf.uint8) ###### img_raw
-        # The type is now uint8 but we need it to be float.
-        image = tf.cast(image, tf.float32)
+        # get image decode from image raw data
+        image = tf.image.decode_jpeg(parsed["image/encoded"])
         # get image shape
-        shape = parsed["image/shape"]
-        # reshape
-        image = tf.reshape(image, shape=shape)
+        shape = tf.shape(image)
         # do data augmentation
         preprocessed_image = preproc.preprocess(image, img_shape=shape, is_training=True)
         # get image class label
