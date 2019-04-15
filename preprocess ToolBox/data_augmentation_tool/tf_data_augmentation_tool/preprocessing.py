@@ -450,6 +450,11 @@ def preprocess_for_train(image, img_shape):
     Returns:
         A preprocessed image.
     """
+    # resize
+    resize_size = 256
+    image = tf.cast(tf.image.resize_images(image, [resize_size, resize_size]), dtype=tf.uint8)
+    img_shape = tf.shape(image)
+    
     # ==========================
     # TODO: do data augmentation
     # ==========================
@@ -490,7 +495,7 @@ def preprocess_for_train(image, img_shape):
     image = _transpose_image(image, 0.2)
     
     # 随机旋转
-    image = _random_rotate(image, rotate_prob=0.2, rotate_angle_max=15)
+    image = _random_rotate(image, rotate_prob=0.3, rotate_angle_max=15)
     
     
     # Border expand and resize
