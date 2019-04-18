@@ -216,6 +216,14 @@ def _aspect_preserving_resize(image, smallest_side):
   return resized_image
 
 
+def _random_crop(image, crop_size, crop_probability):
+    theshold_const = tf.constant(crop_probability, dtype=tf.float32)
+    rand = tf.random_uniform([1], minval=0.0, maxval=1.0, dtype=tf.float32) 
+    image = tf.cond(rand[0] < theshold_const,   
+                    lambda: tf.random_crop(image, [crop_size, crop_size, 3]),
+                    lambda: tf.cast(tf.image.resize_images(image, [crop_size, crop_size]), dtype=tf.uint8))
+    return image
+
 
 def _random_flip(image, left_right_probability, up_down_probability):
     """random flip
@@ -237,7 +245,7 @@ def _random_flip(image, left_right_probability, up_down_probability):
     image = tf.cond(rand[0] < left_right_theshold, 
                     lambda: tf.image.flip_left_right(image), 
                     lambda: tf.identity(image)) 
-    image = tf.cond(rand[0] < up_down_theshold, 
+    image = tf.cond(rand[1] < up_down_theshold, 
                     lambda: tf.image.flip_up_down(image), 
                     lambda: tf.identity(image)) 
     return image
@@ -486,16 +494,16 @@ def preprocess_for_train(image, img_shape):
     # if img_shape > network input size, need to do random crop
     # this is also a effective data augmentation method
     crop_size = 224
-    image = tf.random_crop(image, [crop_size, crop_size, 3])
-    
+    image = _random_crop(image, crop_size, crop_probability=0.5)
+
     # random flip 
-    image = _random_flip(image, left_right_probability=0.5, up_down_probability=0.3)
+    #image = _random_flip(image, left_right_probability=0.5, up_down_probability=0.3)
     
     # 随机转置
-    image = _transpose_image(image, 0.2)
+    #image = _transpose_image(image, 0.2)
     
     # 随机旋转
-    image = _random_rotate(image, rotate_prob=0.3, rotate_angle_max=15)
+    #image = _random_rotate(image, rotate_prob=0.3, rotate_angle_max=15)
     
     
     # Border expand and resize
@@ -519,6 +527,10 @@ def preprocess_for_eval(image):
     Returns:
         A preprocessed image.
     """
+    # resize
+    resize_size = 224
+    image = tf.cast(tf.image.resize_images(image, [resize_size, resize_size]), dtype=tf.uint8)
+    
     # normalize
     image = _normalize_2(image)
     return image
