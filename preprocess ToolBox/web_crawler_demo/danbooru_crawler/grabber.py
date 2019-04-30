@@ -12,8 +12,11 @@ download_dir = './danbooru'
 dataset_info_path = 'dataset_info.txt'
 id_set_path = 'img_id_set.pkl'
 id_set = set()
+tags_download_list_path = 'tmp/tags_list.txt'
 status = 'not done yet'
-max_page_num = 10
+max_page_num = 50000
+checkpoint = 0
+checkpoint_end = 5
 
 
 def save_obj(obj, path):
@@ -25,6 +28,13 @@ def load_obj(path):
     with open(path, 'rb') as f:
         return pickle.load(f)
 
+
+def load_tags_download_list(tags_list_path):
+    tags_download_list = []
+    with open(tags_list_path, 'r') as reader:
+        for line in reader:
+            tags_download_list.append(line.split('\t')[1])
+    return tags_download_list
 
 
 def _get_img_by_url(url, save_dir):
@@ -49,8 +59,9 @@ def _get_img_by_url(url, save_dir):
 def _get_img_by_url2(url, save_dir):
     #response = requests.get(url,timeout=8,proxies=proxies)
     response = requests.get(url, timeout=5)
-    imgDataNp = np.fromstring(response.content, dtype='uint8')
+    imgDataNp = np.frombuffer(response.content, dtype='uint8')
     img = cv2.imdecode(imgDataNp, cv2.IMREAD_UNCHANGED)   # here the img is RGB three dimensional data range from 0-255
+    '''
     dim = len(img.shape)
     if dim == 2:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
@@ -61,8 +72,8 @@ def _get_img_by_url2(url, save_dir):
         print(dim)
         print(img.shape)
         raise("runtimeError")
-    
-    img = cv2.resize(img, (224,224))
+    '''
+    img = cv2.resize(img, (192,192))
     
     # save image
     if save_dir[-1] != '/': # make sure save_dir end with '/'
@@ -97,11 +108,13 @@ def check_post(post):
     if suffix not in ['jpg','png','bmp']:
         flag = False
         print('get wrong suffix {}'.format(suffix))
+        return flag
     # 判断是否已经存在（使用记录的id字典）
     img_id = post['id']
     if img_id in id_set:
         flag = False
-        print('image has already exists, id: {}'.format(img_id))
+        print('image already exists, id: {}'.format(img_id))
+        return flag
     return flag
     
 
@@ -153,15 +166,17 @@ def grabber(tag_argv, page_num):
 
 
 def main():
-    tag_list = ['kiss']
-
-    checkpoint = 0
+    tag_list = load_tags_download_list(tags_download_list_path)
+    
     for i, tag in enumerate(tag_list):
         print("------------------------------------------")
         print("current tag: {}, checkpoint: {}".format(tag, i))
         if checkpoint > i:
             print("skip")
             continue
+        if i >= checkpoint_end:
+            print("come to checkpoint end, return")
+            break
         # start downloading current tag
         status = 'not done yet'
     	n = 1
