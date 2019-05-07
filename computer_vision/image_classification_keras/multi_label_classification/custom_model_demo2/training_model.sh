@@ -1,11 +1,16 @@
 #!/bin/bash
 
-train_script="./src/train.py"
-weight_save_path="./models/smallervgg.h5"
+# choose a network
+#train_script="./src/train_small_vgg.py"
+#weight_save_path="./models/semantic_vector_smallerVGG.h5"
+#record_save_path="./log/smaller_vgg_trainlog.out"
+train_script="./src/train_nin.py"
+weight_save_path="./models/semantic_vector_NIN.h5"
+record_save_path="./log/nin_trainlog.out"
+
 label_file="./dataset/labels.txt"
 label_num=6
 gpu_devices='5'
-record_save_path="./log/train_log.out"
 
 echo "run ${train_script}"
 
