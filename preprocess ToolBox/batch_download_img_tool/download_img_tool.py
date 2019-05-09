@@ -4,10 +4,10 @@ Created on Thu Oct 30 17:03:52 2018
 
 A image download file
 
-Read the text file which records url list of all pictures and download 
+Read the text file which records url list of all pictures and download
 
-In the work, in order to efficiently transfer a large amount of image data, 
-we usually only transmite a text file that records image information according 
+In the work, in order to efficiently transfer a large amount of image data,
+we usually only transmite a text file that records image information according
 to a certain structure.
 
 This tool shows how to download images by reading such a text file.
@@ -25,7 +25,7 @@ import requests
 import numpy as np
 
 # set options
-parser = argparse.ArgumentParser(description = 'manual to this script', 
+parser = argparse.ArgumentParser(description = 'manual to this script',
         usage = textwrap.dedent('''\
         command example:
         python %(prog)s --file_type='npy' --file_path='test.npy' --save_dir='./download'
@@ -61,54 +61,55 @@ def _get_img_by_url(url, save_dir):
     """
     if save_dir[-1] != '/': # make sure save_dir end with '/'
         save_dir += '/'
-    
+
     # request url
     #response = requests.get(url,timeout=0.1,proxies=proxies)
     pic_name = url.split('/')[-1]
     response = requests.get(url,timeout=1)
-    
+
     # save image
     with open(save_dir + pic_name, 'wb') as fd:
         for chunk in response.iter_content(128):  # iter_content saving while downloading
-            fd.write(chunk)    
+            fd.write(chunk)
     print(pic_name,'  OK')
 
 
-def download_from_txt(url_file, save_dir, splitter = '\t', fields_num = 1, url_field_idx = 0):    
+def download_from_txt(url_file, save_dir, splitter = '\t', fields_num = 1, url_field_idx = 0):
     if os.path.exists(save_dir):
         print("warning! save_dir has exists, please check!")
     else:
         os.mkdir(save_dir)
-    
+
     if splitter == '\\t':
         splitter = '\t'
-    
+
     failure_count = 0
     failed_urls = []
     cnt = 0                 #spammer_urls
-    for line in open(url_file).readlines():
-        cnt += 1   
-        item = line.split(splitter)
-        if len(item) == fields_num: 
-            try:
-                url = item[url_field_idx]
-                url = url.rstrip('\n')
-                # rstrip() delete the specified character at the end of the string (default is a space)
-                print(url)
-                _get_img_by_url(url, save_dir)  
-            except:
-                failure_count += 1
-                failed_urls.append(url.rstrip)
+    with open(url_file, 'r') as reader:
+        for line in reader.readlines():
+            cnt += 1
+            item = line.split(splitter)
+            if len(item) == fields_num:
+                try:
+                    url = item[url_field_idx]
+                    url = url.rstrip('\n')
+                    # rstrip() delete the specified character at the end of the string (default is a space)
+                    print(url)
+                    _get_img_by_url(url, save_dir)
+                except:
+                    failure_count += 1
+                    failed_urls.append(url.rstrip)
     print("\nfailed record:")
     print(failure_count)
     print(failed_urls)
-    
+
     # retry the download failed urls
     print("\nretry the download failed urls...")
     for url in failed_urls:
         try:
             print(url)
-            _get_img_by_url(url, save_dir)  
+            _get_img_by_url(url, save_dir)
         except:
             failure_count += 1
             failed_urls.append(url)
@@ -122,7 +123,7 @@ def download_from_npy(npy_file, save_dir):
         print("warning! save_dir has exists, please check!")
     else:
         os.mkdir(save_dir)
-    
+
     url_list = np.load(npy_file)
     for url in url_list:
         #url = url.decode('utf8')
@@ -136,7 +137,7 @@ if __name__ == "__main__":
     file_type = args.file_type
     file_path = args.file_path
     save_dir = args.save_dir
-    
+
     if file_type == 'npy':
         download_from_npy(file_path, save_dir)
     elif file_type == 'txt':
