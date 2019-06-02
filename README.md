@@ -44,8 +44,9 @@ Here is a list shows which algorithms are included in our toolbox, you can check
   * classification
     + VGG
     + GoogleNet
-    + [ResNet](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/image_classification/resNet_template)
+    + [ResNet(Keras)](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/image_classification/resNet_template),  [ResNet(Tensorflow)](https://github.com/monkeyDemon/AI-Toolbox/tree/master/computer_vision/image_classification_tf/resnet50_slim_demo1)
     + [DenseNet](https://github.com/monkeyDemon/AI-Toolbox/tree/master/keras/image_classification/denseNet_template)
+    + [multi label classification](https://github.com/monkeyDemon/AI-Toolbox/tree/master/computer_vision/image_classification_keras/multi_label_classification)
   * object detection
     + RCNN
     + YOLO
@@ -59,3 +60,7 @@ Here is a list shows which algorithms are included in our toolbox, you can check
     + [FFT](https://github.com/monkeyDemon/AI-Toolbox/tree/master/image%20processing%20ToolBox/frequency_domain_method)
   * image segmentation
     + [selective search](https://github.com/monkeyDemon/AI-Toolbox/tree/master/image%20processing%20ToolBox/image_segmentation/selective_search)
+- preprocess tools
+  * [keyFrames extract tool](https://github.com/monkeyDemon/AI-Toolbox/tree/master/preprocess%20ToolBox/keyframes_extract_tool)
+  * [data augmentation tool](https://github.com/monkeyDemon/AI-Toolbox/tree/master/preprocess%20ToolBox/data_augmentation_tool/tf_data_augmentation_tool)
+  * [data annotation tool](https://github.com/monkeyDemon/AI-Toolbox/tree/master/preprocess%20ToolBox/data_annotation_tool)
