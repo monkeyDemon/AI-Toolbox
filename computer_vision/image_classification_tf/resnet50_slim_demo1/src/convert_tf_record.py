@@ -62,6 +62,31 @@ _CUDA_VISIBLE_DEVICES = FLAGS.cuda_visible_devices
 
 
 
+class ImageReader(object):
+  """Helper class that provides TensorFlow image coding utilities."""
+
+  def __init__(self):
+    # Initializes function that decodes RGB JPEG data.
+    self._decode_jpeg_data = tf.placeholder(dtype=tf.string)
+    self._decode_jpeg = tf.image.decode_jpeg(self._decode_jpeg_data, channels=3)
+
+  def read_image_dims(self, sess, image_data):
+    image = self.decode_jpeg(sess, image_data)
+    return image.shape[0], image.shape[1]
+
+  def read_image_shape(self, sess, image_data):
+    image = self.decode_jpeg(sess, image_data)
+    return image.shape
+
+  def decode_jpeg(self, sess, image_data):
+    image = sess.run(self._decode_jpeg,
+                     feed_dict={self._decode_jpeg_data: image_data})
+    assert len(image.shape) == 3
+    assert image.shape[2] == 3
+    return image
+
+
+
 def _get_filenames_and_classes(dataset_dir):
   """Returns a list of filenames and inferred class names.
 
@@ -115,6 +140,7 @@ def _convert_dataset(split_name, filenames, class_names_to_ids):
   num_per_shard = int(math.ceil(len(filenames) / float(num_shards)))
   error_count = 0    # record the number of exceptions
   with tf.Graph().as_default():
+    image_reader = ImageReader()
 
     # setting not fully occupied memory, allocated on demand
     config = tf.ConfigProto()
@@ -134,40 +160,19 @@ def _convert_dataset(split_name, filenames, class_names_to_ids):
                 i+1, len(filenames), shard_id))
             sys.stdout.flush()
 
-            # Read the filename:
-            try:
-                image = Image.open(filenames[i])
-
-                # check size, ignore small image
-                np_img = np.asarray(image)
-                shape = np_img.shape
-                if shape[0] <= 60 and shape[1] <= 60:
-                    continue
-
-                # check format
-                if image.mode != 'RGB':
-                    image = image.convert('RGB')
-
-                # resize
-                image = image.resize((_ZOOM_SIZE, _ZOOM_SIZE), Image.BILINEAR)
-                # get raw data
-                image_raw_data = image.tobytes()
-                # get shape
-                image_shape = np.array([_ZOOM_SIZE, _ZOOM_SIZE, 3])
-                #image_array = np.asarray(image)
-                #image_shape = image_array.shape
-            except Exception, e:
-                print(repr(e))
-                error_count += 1
-                continue
-
             class_name = os.path.basename(os.path.dirname(filenames[i]))
             class_id = class_names_to_ids[class_name]
 
-            #example = dataset_utils.image_to_tfexample(
-            #   image_data, b'jpg', height, width, class_id)
-            example = dataset_utils.image_to_tfexample2(image_raw_data, image_shape, class_id)
-            tfrecord_writer.write(example.SerializeToString())
+            try:
+                #tf_example = dataset_utils.get_tf_example_RGB(filenames[i], class_id)
+                #tf_example = dataset_utils.get_tf_example_RGB_RESIZE2(filenames[i], class_id, _ZOOM_SIZE)
+                tf_example = dataset_utils.get_tf_example_RGB_RESIZE(filenames[i], class_id, _ZOOM_SIZE)
+            except Exception, e:
+                print("error occur! img {} with error: {}".format(filenames[i], repr(e)))
+                error_count += 1
+                continue
+
+            tfrecord_writer.write(tf_example.SerializeToString())
 
   sys.stdout.write('\n')
   sys.stdout.write('the number of exceptions occured: %d \n' % error_count)
@@ -190,6 +195,7 @@ def build_tfrecord(dataset_root_dir, tfrecord_save_path):
 	print("stop")
 	return
 	
+
   print('\nloading all images\' filename list...')
   photo_filenames, class_names = _get_filenames_and_classes(dataset_root_dir)
   

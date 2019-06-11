@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# modified by: zyb_as 2019/6/10
 # ==============================================================================
 """Contains utilities for downloading and converting datasets."""
 from __future__ import absolute_import
@@ -18,10 +20,9 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import io
 import sys
-import tarfile
-
-from six.moves import urllib
+from PIL import Image
 import tensorflow as tf
 
 
@@ -78,22 +79,111 @@ def float_list_feature(value):
     return tf.train.Feature(float_list=tf.train.FloatList(value=value))
 
 
-def image_to_tfexample(image_data, image_format, height, width, class_id):
-  return tf.train.Example(features=tf.train.Features(feature={
-      'image/encoded': bytes_feature(image_data),
-      'image/format': bytes_feature(image_format),
-      'image/class/label': int64_feature(class_id),
-      'image/height': int64_feature(height),
-      'image/width': int64_feature(width),
-      'image/channel': int64_feature(3)
-  }))
+def process_image_channels(image):
+    process_flag = False
+    if image.mode == 'RGBA':
+        # process the 4 channels .png
+        r, g, b, a = image.split()
+        image = Image.merge("RGB", (r,g,b))
+        process_flag = True
+    elif image.mode != 'RGB':
+        # process the one channel image
+        image = image.convert("RGB")
+        process_flag = True
+    return image, process_flag
 
-def image_to_tfexample2(image_data, img_shape, class_id):
-  return tf.train.Example(features=tf.train.Features(feature={
-      'image/encoded': bytes_feature(image_data),
-      'image/shape': int64_list_feature(img_shape),
-      'image/class/label': int64_feature(class_id),
-  }))
+
+def process_image_resize(image, resize):
+    if resize is not None:
+        image = image.resize((resize, resize), Image.ANTIALIAS)
+    return image
+
+
+def process_image_resize2(image, resize):
+    width, height = image.size
+    if resize is not None:
+        if width > height:
+            width = resize
+            height = int(height * resize / width) 
+        else:
+            height = resize
+            width = int(width * resize / height)
+        image = image.resize((width, height), Image.ANTIALIAS)
+    return image
+
+
+def get_tf_example_RGB(image_path, label):
+    image = Image.open(image_path)
+    # process pic to three channels(png has four channels and gray has one)
+    image, process_flag = process_image_channels(image)
+    # get image size: width and height
+    width, height = image.size
+    # get image raw data
+    bytes_io = io.BytesIO()
+    image.save(bytes_io, format='JPEG')
+    image_raw_data = bytes_io.getvalue()
+    # build tf_example
+    tf_example = tf.train.Example(
+        features=tf.train.Features(
+            feature={
+                'image/encoded': bytes_feature(image_raw_data),
+                'image/label': int64_feature(label),
+                'image/width': int64_feature(width),
+                'image/height': int64_feature(height)
+            }
+        ))
+    return tf_example 
+
+
+def get_tf_example_RGB_RESIZE(image_path, label, resize=None):
+    image = Image.open(image_path)
+    # process pic to three channels(png has four channels and gray has one)
+    image, process_flag = process_image_channels(image)
+    # reshape image
+    image = process_image_resize(image, resize)
+    # get image raw data
+    bytes_io = io.BytesIO()
+    image.save(bytes_io, format='JPEG')
+    image_raw_data = bytes_io.getvalue()
+    # get image size: width and height
+    width, height = image.size
+    # build tf_example
+    tf_example = tf.train.Example(
+        features=tf.train.Features(
+            feature={
+                'image/encoded': bytes_feature(image_raw_data),
+                'image/label': int64_feature(label),
+                'image/width': int64_feature(width),
+                'image/height': int64_feature(height)
+            }
+        ))
+    return tf_example 
+
+
+def get_tf_example_RGB_RESIZE2(image_path, label, resize=None):
+    image = Image.open(image_path)
+    # process pic to three channels(png has four channels and gray has one)
+    image, process_flag = process_image_channels(image)
+    # reshape image
+    image = process_image_resize2(image, resize)
+    # get image raw data
+    bytes_io = io.BytesIO()
+    image.save(bytes_io, format='JPEG')
+    image_raw_data = bytes_io.getvalue()
+    # get image size: width and height
+    width, height = image.size
+    # build tf_example
+    tf_example = tf.train.Example(
+        features=tf.train.Features(
+            feature={
+                'image/encoded': bytes_feature(image_raw_data),
+                'image/label': int64_feature(label),
+                'image/width': int64_feature(width),
+                'image/height': int64_feature(height)
+            }
+        ))
+    return tf_example 
+
 
 def write_label_file(labels_to_class_names, dataset_dir,
                      filename='labels.txt'):
