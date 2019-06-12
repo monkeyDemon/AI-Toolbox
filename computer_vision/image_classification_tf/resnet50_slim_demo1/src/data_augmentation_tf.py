@@ -447,12 +447,19 @@ def _random_gauss_filtering(image, probability, img_shape):
 
 
 
+
 # ==========================
 # interface function to call
 # ==========================
 
+
 def augmentation_for_train(image, img_shape):
     """Preprocesses the given image for training.
+
+    First, resize the image to uniform size 256 * 256
+    Second, do all the color space transformations(adjust brightness, contrast and so on...)
+    Third, do random crop to uniform size 224 * 224
+    At last, do all the position transformations
 
     Args:
     image: A image tensor,
@@ -520,7 +527,7 @@ def augmentation_for_train(image, img_shape):
     return image
 
 
-def augmentation_for_eval(image):
+def augmentation_for_eval(image, img_shape):
     """Preprocesses the given image for evaluation.
 
     Args:
@@ -539,8 +546,100 @@ def augmentation_for_eval(image):
     return image
 
 
+def augmentation_for_train2(image, img_shape):
+    """Preprocesses the given image for training.
 
-#def prepro#cess(image, is_training):
+    make sure the input image's long edge has been resized to 256 (maintain aspect ratio)
+    First, do all the color space transformations(adjust brightness, contrast and so on...)
+    Second, padding the image to uniform size 256 * 256
+    Third, do random crop to uniform size 224 * 224
+    At last, do all the position transformations
+    
+    Args:
+    image: A image tensor,
+    img_shape: shape of image
+
+    Returns:
+        A preprocessed image.
+    """
+    # ==========================
+    # TODO: do data augmentation
+    # ==========================
+
+    # -----color space transformation-----
+    
+    # 随机调整亮度 
+    image = _random_adjust_brightness(image, probability=0.3)
+    
+    # 随机调整对比度
+    image = _random_adjust_contrast(image, 0.3)  
+    
+    # 随机调整色相
+    image = _random_adjust_hue(image, 0.3)
+    
+    # 图像饱和度，
+    image = _random_adjust_saturation(image, 0.3)    
+    
+    # 随机添加均匀分布噪声  
+    #image = _random_uniform_noise(image, 0.3, img_shape)
+
+    # 随机进行高斯滤波
+    #image = _random_gauss_filtering(image, 0.3, img_shape)   
+    
+    
+    # -----position transformation-----
+
+    # padding
+    resize_size = 256
+    image = tf.image.resize_image_with_crop_or_pad(image, resize_size, resize_size)
+    
+    # random crop
+    # if img_shape > network input size, need to do random crop
+    # this is also a effective data augmentation method
+    crop_size = 224
+    image = _random_crop(image, crop_size, crop_probability=0.5)
+
+    # random flip 
+    image = _random_flip(image, left_right_probability=0.5, up_down_probability=0.3)
+    
+    # 随机转置
+    image = _transpose_image(image, 0.2)
+    
+    # 随机旋转
+    image = _random_rotate(image, rotate_prob=0.3, rotate_angle_max=15)
+    
+    # normalize  
+    #image = _normalize_2(image)
+    return image
+
+
+def augmentation_for_eval2(image, img_shape):
+    """Preprocesses the given image for evaluation.
+
+    make sure the input image's long edge has been resized to 256 (maintain aspect ratio)
+    padding to uniform size 256 * 256
+    resize the image to uniform size 224 * 224
+    
+    Args:
+    image: A image tensor,
+    img_shape: shape of image
+
+    Returns:
+        A preprocessed image.
+    """
+    # padding
+    resize_size = 256
+    image = tf.image.resize_image_with_crop_or_pad(image, resize_size, resize_size)
+
+    # resize
+    resize_size = 224
+    image = tf.cast(tf.image.resize_images(image, [resize_size, resize_size]), dtype=tf.uint8)
+    
+    # normalize
+    #image = _normalize_2(image)
+    return image
+
+
 def augmentation(image, img_shape, is_training):
     """preprocessing.
     
@@ -557,4 +656,4 @@ def augmentation(image, img_shape, is_training):
     if is_training:
         return augmentation_for_train(image, img_shape)
     else:
-        return augmentation_for_eval(image)
+        return augmentation_for_eval(image, img_shape)
