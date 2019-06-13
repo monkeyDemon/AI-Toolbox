@@ -103,6 +103,11 @@ with tf.Session() as sess:
     plt.imshow(transposed.eval())
     plt.show()
 
+    # 填充
+    print("\n padding image")
+    padding_image = tf.image.resize_image_with_crop_or_pad(img_data,1000,600)
+    plt.imshow(padding_image.eval())
+    plt.show()
     # -----normalization-----
     
     # 将代表一张图片的三维矩阵中的数字均值变为0，方差变为1。

@@ -10,7 +10,6 @@ Copied and Modified from:
     https://github.com/tensorflow/models/blob/master/research/slim/
     preprocessing/vgg_preprocessing.py
 """
-
 import math
 import numpy as np
 import tensorflow as tf
@@ -214,6 +213,18 @@ def _aspect_preserving_resize(image, smallest_side):
   resized_image = tf.squeeze(resized_image)
   resized_image.set_shape([None, None, 3])
   return resized_image
+
+
+def _random_distortion(image, img_shape):
+    height = tf.cast(img_shape[0], dtype=tf.float32)
+    width = tf.cast(img_shape[1], dtype=tf.float32)
+    w_flex = tf.random_uniform([1], minval=0.8, maxval=1.2, dtype=tf.float32)
+    h_flex = tf.random_uniform([1], minval=0.8, maxval=1.2, dtype=tf.float32)
+    height = tf.cast(height * h_flex, dtype=tf.int32)
+    width = tf.cast(width * w_flex, dtype=tf.int32)
+    new_shape = tf.concat([height,width], 0)
+    image = tf.cast(tf.image.resize_images(image, new_shape), dtype=tf.uint8)
+    return image
 
 
 def _random_crop(image, crop_size, crop_probability):
@@ -448,9 +459,15 @@ def _random_gauss_filtering(image, probability, img_shape):
 # interface function to call
 # ==========================
 
+
 def preprocess_for_train(image, img_shape):
     """Preprocesses the given image for training.
 
+    First, resize the image to uniform size 256 * 256
+    Second, do all the color space transformations(adjust brightness, contrast and so on...)
+    Third, do random crop to uniform size 224 * 224
+    At last, do all the position transformations
+    
     Args:
     image: A image tensor,
     img_shape: shape of image
@@ -517,9 +534,11 @@ def preprocess_for_train(image, img_shape):
     return image
 
 
-def preprocess_for_eval(image):
+def preprocess_for_eval(image, img_shape):
     """Preprocesses the given image for evaluation.
 
+    just resize the input image to uniform size 224 * 224
+    
     Args:
     image: A image tensor,
     img_shape: shape of image
@@ -536,8 +555,128 @@ def preprocess_for_eval(image):
     return image
 
 
+def preprocess_for_train2(image, img_shape):
+    """Preprocesses the given image for training.
 
-#def prepro#cess(image, is_training):
+    First, resize long edge to 256 (maintain aspect ratio)
+    Second, do all the color space transformations(adjust brightness, contrast and so on...)
+    Third, padding the image to uniform size 256 * 256
+    Then, do random crop to uniform size 224 * 224
+    At last, do all the position transformations
+    
+    Args:
+    image: A image tensor,
+    img_shape: shape of image
+
+    Returns:
+        A preprocessed image.
+    """
+    # resize long edge to 256 (maintain aspect ratio)
+    resize_size = 256
+    height = img_shape[0].eval()
+    width = img_shape[1].eval()
+    if width > height:
+        height = int(height * resize_size / width)
+        width = resize_size
+    else:
+        width = int(width * resize_size / height)
+        height = resize_size
+    image = tf.cast(tf.image.resize_images(image, [height, width]), dtype=tf.uint8)
+    img_shape = tf.shape(image)
+    
+    # ==========================
+    # TODO: do data augmentation
+    # ==========================
+
+    # -----color space transformation-----
+    
+    # 随机调整亮度 
+    image = _random_adjust_brightness(image, probability=0.3)
+    
+    # 随机调整对比度
+    image = _random_adjust_contrast(image, 0.3)  
+    
+    # 随机调整色相
+    image = _random_adjust_hue(image, 0.3)
+    
+    # 图像饱和度，
+    image = _random_adjust_saturation(image, 0.3)    
+    
+    # 随机添加均匀分布噪声  
+    #image = _random_uniform_noise(image, 0.3, img_shape)
+
+    # 随机进行高斯滤波
+    #image = _random_gauss_filtering(image, 0.3, img_shape)   
+    
+    
+    # -----position transformation-----
+
+    # distortion
+    image = _random_distortion(image, img_shape)
+
+    # padding
+    image = tf.image.resize_image_with_crop_or_pad(image, resize_size, resize_size)
+    
+    # random crop
+    # if img_shape > network input size, need to do random crop
+    # this is also a effective data augmentation method
+    crop_size = 224
+    image = _random_crop(image, crop_size, crop_probability=0.5)
+
+    # random flip 
+    image = _random_flip(image, left_right_probability=0.5, up_down_probability=0.3)
+    
+    # 随机转置
+    image = _transpose_image(image, 0.2)
+    
+    # 随机旋转
+    image = _random_rotate(image, rotate_prob=0.3, rotate_angle_max=15)
+    
+    
+    # Border expand and resize
+    # 以最长边扩展为最大正方形, 和其他方法综合使用可能会造成一些奇怪的生成结果
+    #_fixed_resize_side = 224
+    #image = border_expand(image, resize=True, 
+    #        output_height=_fixed_resize_side, output_width=_fixed_resize_side)
+    
+    # normalize  
+    image = _normalize_2(image)
+    return image
+
+
+def preprocess_for_eval2(image, img_shape):
+    """Preprocesses the given image for evaluation.
+
+    First, resize long edge to 224 (maintain aspect ratio)
+    Second, padding to uniform size 224 * 224
+    
+    Args:
+    image: A image tensor,
+    img_shape: shape of image
+
+    Returns:
+        A preprocessed image.
+    """
+    # resize long edge to 224 (maintain aspect ratio)
+    resize_size = 224
+    height = img_shape[0].eval()
+    width = img_shape[1].eval()
+    if width > height:
+        height = int(height * resize_size / width)
+        width = resize_size
+    else:
+        width = int(width * resize_size / height)
+        height = resize_size
+    image = tf.cast(tf.image.resize_images(image, [height, width]), dtype=tf.uint8)
+    
+    # padding
+    image = tf.image.resize_image_with_crop_or_pad(image, resize_size, resize_size)
+    
+    # normalize
+    image = _normalize_2(image)
+    return image
+
+
 def preprocess(image, img_shape, is_training):
     """preprocessing.
     
@@ -552,6 +691,6 @@ def preprocess(image, img_shape, is_training):
         preprocessed inputs:
     """ 
     if is_training:
-        return preprocess_for_train(image, img_shape)
+        return preprocess_for_train2(image, img_shape)
     else:
-        return preprocess_for_eval(image)
+        return preprocess_for_eval2(image, img_shape)
