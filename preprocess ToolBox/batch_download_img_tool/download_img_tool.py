@@ -89,17 +89,15 @@ def download_from_txt(url_file, save_dir, splitter = '\t', fields_num = 1, url_f
     with open(url_file, 'r') as reader:
         for line in reader.readlines():
             cnt += 1
-            item = line.split(splitter)
+            item = line.rstrip('\n').split(splitter)
             if len(item) == fields_num:
                 try:
                     url = item[url_field_idx]
-                    url = url.rstrip('\n')
-                    # rstrip() delete the specified character at the end of the string (default is a space)
                     print(url)
                     _get_img_by_url(url, save_dir)
                 except:
                     failure_count += 1
-                    failed_urls.append(url.rstrip)
+                    failed_urls.append(url)
     print("\nfailed record:")
     print(failure_count)
     print(failed_urls)
@@ -112,7 +110,6 @@ def download_from_txt(url_file, save_dir, splitter = '\t', fields_num = 1, url_f
             _get_img_by_url(url, save_dir)
         except:
             failure_count += 1
-            failed_urls.append(url)
 
 
 
