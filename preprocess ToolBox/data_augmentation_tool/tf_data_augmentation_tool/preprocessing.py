@@ -308,7 +308,7 @@ def _random_adjust_brightness(image, probability):
     rand = tf.random_uniform([1], minval=0.0, maxval=1.0, dtype=tf.float32) 
     # tf.image.random_brightness, 在[-max_delta, max_delta)的范围随机调整图片的亮度。
     image = tf.cond(rand[0] < theshold_const, 
-                    lambda: tf.image.random_brightness(image, max_delta=0.3), 
+                    lambda: tf.image.random_brightness(image, max_delta=0.2),
                     lambda: tf.identity(image)) 
     return image
 
@@ -317,7 +317,7 @@ def _random_adjust_contrast(image, probability):
     theshold_const = tf.constant(probability, dtype=tf.float32)
     rand = tf.random_uniform([1], minval=0.0, maxval=1.0, dtype=tf.float32) 
     image = tf.cond(rand[0] < theshold_const, 
-                    lambda: tf.image.random_contrast(image, lower=0.5, upper=1.5),
+                    lambda: tf.image.random_contrast(image, lower=0.7, upper=1.3),
                     lambda: tf.identity(image))
     return image
 
@@ -327,7 +327,7 @@ def _random_adjust_hue(image, probability):
     rand = tf.random_uniform([1], minval=0.0, maxval=1.0, dtype=tf.float32)
     # 在[-max_delta, max_delta]的范围随机调整图片的色相。max_delta的取值在[0, 0.5]之间。
     image = tf.cond(rand[0] < theshold_const,   # 0.01，>1
-                    lambda: tf.image.random_hue(image, 0.15), 
+                    lambda: tf.image.random_hue(image, 0.05),
                     lambda: tf.identity(image)) 
     return image
 
@@ -336,7 +336,7 @@ def _random_adjust_saturation(image, probability):
     theshold_const = tf.constant(probability, dtype=tf.float32)
     rand = tf.random_uniform([1], minval=0.0, maxval=1.0, dtype=tf.float32) 
     image = tf.cond(rand[0] < theshold_const,   
-                    lambda: tf.image.random_saturation(image, lower=0.5, upper=3),
+                    lambda: tf.image.random_saturation(image, lower=0.8, upper=1.5),
                     lambda: tf.identity(image))
     return image
 
