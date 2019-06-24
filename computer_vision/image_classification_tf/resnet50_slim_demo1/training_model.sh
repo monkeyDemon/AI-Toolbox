@@ -8,6 +8,8 @@ tf_record_dir="./tfrecord"
 # Path to pretrained ResNet-50 model.
 # you can download pretrained model here https://github.com/tensorflow/models/tree/master/research/slim
 checkpoint_path="path to pretrained model/resnet_v1_50.ckpt"
+# train from scratch on imagenet pretrained model or continue training on previous model
+train_from_scratch=True
 # Path to label file.
 label_path="./tfrecord/labels.txt"
 # Path to log directory.
@@ -38,6 +40,7 @@ echo "run ${train_script}"
 nohup python ${train_script} \
     --tf_record_dir=${tf_record_dir} \
     --checkpoint_path=${checkpoint_path} \
+    --train_from_scratch=${train_from_scratch} \
     --label_path=${label_path} \
     --log_dir=${log_dir} \
     --learning_rate=${learning_rate} \

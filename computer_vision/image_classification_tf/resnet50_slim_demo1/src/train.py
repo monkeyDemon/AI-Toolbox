@@ -3,19 +3,11 @@ from __future__ import division
 """
 Created on Thu Oct 11 17:21:35 2018
 
-@author: zyb_as 
+Train a CNN classification model via pretrained ResNet-50 model.
+
+@author: shirhe-lyh
+@modified: zyb_as
 """
-
-"""Train a CNN classification model via pretrained ResNet-50 model.
-
-Example Usage:
----------------
-python3 train.py \
-    --checkpoint_path: Path to pretrained ResNet-50 model.
-    --record_path: Path to training tfrecord file.
-    --logdir: Path to log directory.
-"""
-
 import os
 import sys
 import math
@@ -42,6 +34,8 @@ flags.DEFINE_string('checkpoint_path',
                     '/home/ansheng/cv_strategy/model_zoo/' +
                     'resnet_v1_50.ckpt', 
                     'Path to pretrained ResNet-50 model.')
+flags.DEFINE_boolean('train_from_scratch', True, 
+    'train from scratch on imagenet pretrained model or continue training on previous model')
 flags.DEFINE_string('label_path',
                     '/home/ansheng/cv_strategy/porn_detect/cnn_tf/' +
                     'classification_by_slim/tfrecord/labels.txt',
@@ -63,6 +57,74 @@ flags.DEFINE_integer('batch_size', 48, 'Batch size')
 
 FLAGS = flags.FLAGS
 
+    
+'''    
+def configure_learning_rate(num_samples_per_epoch, global_step):
+    """Configures the learning rate.
+    
+    Modified from:
+        https://github.com/tensorflow/models/blob/master/research/slim/
+        train_image_classifier.py
+    
+    Args:
+        num_samples_per_epoch: he number of samples in each epoch of training.
+        global_step: The global_step tensor.
+        
+    Returns:
+        A `Tensor` representing the learning rate.
+    """
+    decay_steps = int(num_samples_per_epoch * FLAGS.num_epochs_per_decay /
+                      FLAGS.batch_size)
+    return tf.train.exponential_decay(FLAGS.learning_rate,
+                                      global_step,
+                                      decay_steps,
+                                      FLAGS.learning_rate_decay_factor,
+                                      staircase=True,
+                                      name='exponential_decay_learning_rate')
+    
+    
+def get_init_fn():
+    """Returns a function run by che chief worker to warm-start the training.
+    
+    Modified from:
+        https://github.com/tensorflow/models/blob/master/research/slim/
+        train_image_classifier.py
+    
+    Note that the init_fn is only run when initializing the model during the 
+    very first global step.
+    
+    Returns:
+        An init function run by the supervisor.
+    """
+    if FLAGS.checkpoint_path is None:
+        return None
+    
+    # Warn the user if a checkpoint exists in the train_dir. Then we'll be
+    # ignoring the checkpoint anyway.
+    if tf.train.latest_checkpoint(FLAGS.logdir):
+        tf.logging.info(
+            'Ignoring --checkpoint_path because a checkpoint already exists ' +
+            'in %s' % FLAGS.logdir)
+        return None
+    
+    if tf.gfile.IsDirectory(FLAGS.checkpoint_path):
+        checkpoint_path = tf.train.latest_checkpoint(FLAGS.checkpoint_path)
+    else:
+        checkpoint_path = FLAGS.checkpoint_path
+
+    tf.logging.info('Fine-tuning from %s' % checkpoint_path)
+    
+    variables_to_restore = slim.get_variables_to_restore()
+    return slim.assign_from_checkpoint_fn(
+        checkpoint_path,
+        variables_to_restore,
+        ignore_missing_vars=True)
+'''
+
+
+
+
+
 
 def get_learning_rate(epoch_step, cur_learning_rate, lr_decay_factor, num_epochs_per_decay):
     """get the learning rate.
@@ -83,6 +145,7 @@ def main(_):
 
     model_ckpt_path = FLAGS.checkpoint_path # Path to the pretrained model
     model_save_dir = FLAGS.log_dir  # Path to the model.ckpt-(num_steps) will be saved
+    train_from_scratch = FLAGS.train_from_scratch # train from scratch on imagenet pretrained model or continue training on previous model
     tensorboard_summary_dir = os.path.join(model_save_dir, 'tensorboard_summary')
     tf_record_dir = FLAGS.tf_record_dir
     batch_size = FLAGS.batch_size
@@ -113,8 +176,8 @@ def main(_):
     inputs_dict = classification_model.preprocess(inputs, is_training)
     predict_dict = classification_model.predict(inputs_dict)
 
-    loss_dict = classification_model.loss(predict_dict, labels)
-    #loss_dict = classification_model.focal_loss(predict_dict, labels)
+    #loss_dict = classification_model.loss(predict_dict, labels)
+    loss_dict = classification_model.focal_loss(predict_dict, labels)
     loss = loss_dict['loss']
 
     postprocessed_dict = classification_model.postprocess(predict_dict)
@@ -132,13 +195,14 @@ def main(_):
     with tf.control_dependencies([tf.group(*update_ops)]):
         train_step = optimizer.minimize(loss, global_step)
     
-
-    # init Saver to restore and save model
-    checkpoint_exclude_scopes = 'Logits'
-    exclusions = None
-    if checkpoint_exclude_scopes:
-        exclusions = [
-            scope.strip() for scope in checkpoint_exclude_scopes.split(',')]
+    # init Saver to restore model
+    if train_from_scratch:
+        # if train from imagenet pretrained model, exclude the last classification layer
+        checkpoint_exclude_scopes = 'Logits'
+        exclusions = [scope.strip() for scope in checkpoint_exclude_scopes.split(',')]
+    else:   
+        # if continue training, just restore the whole model
+        exclusions = []
     variables_to_restore = []
     for var in slim.get_model_variables():
         excluded = False
@@ -147,9 +211,9 @@ def main(_):
                 excluded = True
         if not excluded:
             variables_to_restore.append(var)
-
     saver_restore = tf.train.Saver(var_list=variables_to_restore)
-    
+
+    # init Saver to save model
     saver = tf.train.Saver(tf.global_variables())
     
     init = tf.global_variables_initializer()
@@ -157,7 +221,7 @@ def main(_):
     # config and start session
     config = tf.ConfigProto() 
     config.gpu_options.allow_growth=True
-    config.gpu_options.per_process_gpu_memory_fraction = 0.5
+    config.gpu_options.per_process_gpu_memory_fraction = 0.9
     with tf.Session(config=config) as sess:
         sess.run(init)
         
@@ -190,6 +254,14 @@ def main(_):
                 # get a new batch data
                 try:
                     images, groundtruth_lists = sess.run([train_feature, train_label]) 
+                    #for i in range(len(images)):
+                    #    img = images[i]
+                    #    img = img + 1
+                    #    img = img * 128
+                    #    #img = (img * 128) + 128
+                    #    img =img.astype(np.uint8) 
+                    #    img = Image.fromarray(img)
+                    #    img.save("./tmp/" + str(total_batch_num) + "_" + str(i) + ".jpg")
                         
                     total_batch_num += 1
                     batch_num += 1
@@ -282,6 +354,42 @@ def main(_):
             time.sleep(120) # let gpu take a breath
             print("\n\n")
             sys.stdout.flush()
+
+
+
+    #dataset = get_record_dataset(FLAGS.train_record_path, num_samples=FLAGS.num_samples, 
+    #                             num_classes=FLAGS.num_classes)
+    #data_provider = slim.dataset_data_provider.DatasetDataProvider(dataset)
+    #image, label = data_provider.get(['image', 'label'])
+	# 
+    ## get preprocessed batch data
+    #preprocessed_inputs, labels = preprocessing.preprocess(image, label, is_training=True, batch_size=FLAGS.batch_size)
+    #    
+    #cls_model = model.Model(is_training=True, num_classes=FLAGS.num_classes)
+    #prediction_dict = cls_model.predict(preprocessed_inputs)
+    #loss_dict = cls_model.loss(prediction_dict, labels)
+    #loss = loss_dict['loss']
+    #postprocessed_dict = cls_model.postprocess(prediction_dict)
+    #acc = cls_model.accuracy(postprocessed_dict, labels)
+    #tf.summary.scalar('loss', loss)
+    #tf.summary.scalar('accuracy', acc)
+
+    #global_step = slim.create_global_step()
+    #learning_rate = configure_learning_rate(FLAGS.num_samples, global_step)
+    #optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate, 
+    #                                       momentum=0.9)
+#   # optimizer = tf.train.AdamOptimizer(learning_rate=0.00001)
+    #train_op = slim.learning.create_train_op(loss, optimizer,
+    #                                         summarize_gradients=True)
+    #tf.summary.scalar('learning_rate', learning_rate)
+    #
+    #init_fn = get_init_fn()
+    #
+    #sys.stdout.flush()
+    #slim.learning.train(train_op=train_op, logdir=FLAGS.logdir, 
+    #                    init_fn=init_fn, number_of_steps=FLAGS.num_steps,
+    #                    save_summaries_secs=20,
+    #                    save_interval_secs=3600)
     
 
 if __name__ == '__main__':
