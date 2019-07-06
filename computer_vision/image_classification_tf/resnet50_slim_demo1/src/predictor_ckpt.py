@@ -63,7 +63,6 @@ class Predictor(object):
                 self._prediction = tf.get_default_graph().get_tensor_by_name('score_list:0')
                 
                 self._sess = sess
-            
                 #pred = sess.run(prediction, feed_dict={inputs: xxx}
         
         

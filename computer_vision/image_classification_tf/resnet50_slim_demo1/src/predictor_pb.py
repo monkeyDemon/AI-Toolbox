@@ -36,10 +36,12 @@ class Predictor(object):
         self._gpu_index = gpu_index
         
         self._graph, self._sess = self._load_model(frozen_inference_graph_path)
+        # TODO: need to modify
         self._inputs = self._graph.get_tensor_by_name('image_tensor:0')
         self._logits = self._graph.get_tensor_by_name('logits:0')
         self._classes = self._graph.get_tensor_by_name('classes:0')
-        
+
+
     def _load_model(self, frozen_inference_graph_path):
         """Load a (frozen) Tensorflow model into memory.
         
@@ -64,18 +66,19 @@ class Predictor(object):
             
         graph = tf.Graph()
         with graph.as_default():
-            od_graph_def = tf.GraphDef()
+            graph_def = tf.GraphDef()
             with tf.gfile.GFile(frozen_inference_graph_path, 'rb') as fid:
                 serialized_graph = fid.read()
-                od_graph_def.ParseFromString(serialized_graph)
-                tf.import_graph_def(od_graph_def, name='')
+                graph_def.ParseFromString(serialized_graph)
+                tf.import_graph_def(graph_def, name='')
             
         config = tf.ConfigProto(allow_soft_placement = True) 
         config.gpu_options.allow_growth=True
         #config.gpu_options.per_process_gpu_memory_fraction = 0.50
         sess = tf.Session(graph=graph, config=config)
         return graph, sess
-        
+
+
     def predict(self, inputs):
         """Predict prediction tensors from inputs tensor.
         
@@ -90,4 +93,3 @@ class Predictor(object):
         classes = self._sess.run(self._classes, feed_dict=feed_dict)
         return classes
     
-        
