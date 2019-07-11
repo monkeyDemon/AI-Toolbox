@@ -15,7 +15,7 @@ import glob
 import os
 import tensorflow as tf
 
-import predictor
+import predictor_pb
 import predictor_ckpt
 
 flags = tf.app.flags
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     print('loading model...')
     weight_type = weight_path.split('.')[-1]
     if weight_type == 'pb':
-        model = predictor.Predictor(weight_path, gpu_index=gpu_device)
+        model = predictor_pb.Predictor(weight_path, gpu_index=gpu_device)
     else:
         # ckpt
         model = predictor_ckpt.Predictor(weight_path, gpu_index=gpu_device)

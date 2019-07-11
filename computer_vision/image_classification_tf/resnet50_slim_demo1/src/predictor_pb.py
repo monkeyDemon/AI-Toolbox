@@ -3,10 +3,15 @@
 Created on Thu Oct 11 11:49:09 2018
 
 @author: shirhe-lyh
+@modified by: zyb_as
 """
 
 import os
 import tensorflow as tf
+
+# if your graph file *.pb is transformed by tensorRT, import tensorRT
+# otherwise you will see the error: Op type not registered 'TRTEngineOp' in binary running on ...
+import tensorflow.contrib.tensorrt as trt
 
 # Note: We need to import addditional module to fix the following bug:
 # tensorflow.python.framework.errors_impl.NotFoundError: Op type not 
@@ -37,9 +42,9 @@ class Predictor(object):
         
         self._graph, self._sess = self._load_model(frozen_inference_graph_path)
         # TODO: need to modify
-        self._inputs = self._graph.get_tensor_by_name('image_tensor:0')
-        self._logits = self._graph.get_tensor_by_name('logits:0')
-        self._classes = self._graph.get_tensor_by_name('classes:0')
+        self._inputs = self._graph.get_tensor_by_name('inputs:0')
+        self._is_training = self._graph.get_tensor_by_name('is_training:0')
+        self._prediction = self._graph.get_tensor_by_name('score_list:0')
 
 
     def _load_model(self, frozen_inference_graph_path):
@@ -89,7 +94,6 @@ class Predictor(object):
         Returns:
             classes: A 1D integer tensor with shape [batch_size].
         """
-        feed_dict = {self._inputs: inputs}
-        classes = self._sess.run(self._classes, feed_dict=feed_dict)
+        feed_dict = {self._inputs: inputs, self._is_training: False}
+        classes = self._sess.run(self._prediction, feed_dict=feed_dict)
         return classes
-    
