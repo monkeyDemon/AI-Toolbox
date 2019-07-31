@@ -53,7 +53,8 @@ def saveModel(model_path, graph, sess):
 def prepareImage(image):
     # 定义预处理方法
     # 这样部署后，只需直接传入base64的string即可直接得到结果
-    img_decoded = tf.image.decode_png(image, channels=3)
+    #img_decoded = tf.image.decode_png(image, channels=3)
+    img_decoded = tf.image.decode_jpeg(image, channels=3)
 
     # 与本demo一致的tensor版本预处理，保持长宽比将长边resize到224，然后padding到224*224
     shape = tf.shape(img_decoded)
@@ -88,7 +89,8 @@ def freeze_graph(input_checkpoint, output_graph_path):
 
         images = tf.placeholder(tf.string, name="images")
         images_rank = tf.cond(tf.less(tf.rank(images), 1), lambda: tf.expand_dims(images, 0), lambda: images)
-        orignal_inputs = tf.map_fn(prepareImage, images_rank, dtype=tf.float32)
+        #orignal_inputs = tf.map_fn(prepareImage, images_rank, dtype=tf.float32)
+        orignal_inputs = tf.map_fn(prepareImage, images_rank, dtype=tf.uint8)
 
         is_training = False 
         num_classes = 2
