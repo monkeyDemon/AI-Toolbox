@@ -2,6 +2,11 @@
 """
 Created on Thu Oct 11 11:49:09 2018
 
+封装的预测器
+
+支持savemodel格式导出的模型
+用于在预测阶段提供前向推导功能
+
 @author: shirhe-lyh
 @modified by: zyb_as
 """
