@@ -57,7 +57,7 @@ for root, dirs, files in os.walk(src_dir):
             shape = img_cv.shape
             if len(shape) == 3:
                 pass # this image is valid
-            elif len(shape) == 1:
+            elif len(shape) == 2:
                 # change channel num to 3 
                 print("change {} from gray to rgb".format(file_name))
                 img_rgb = cv2.merge((img_cv, img_cv, img_cv))

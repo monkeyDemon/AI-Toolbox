@@ -3,9 +3,11 @@ Created on Mon Feb 11 14:34:02 2019
 
 Converts images data to TFRecords of TF-Example protos.
 
-This module reads the files and creates two TFRecord datasets: one for train
-and one for test. Each TFRecord dataset is comprised of a set of TF-Example
-protocol buffers, each of which contain a single image and label.
+This module reads the files and creates two TFRecord datasets: 
+one for train and one for test. 
+
+Each TFRecord dataset is comprised of a set of TF-Example protocol buffers, 
+each of which contain a single image and label.
 
 this script is modified on 
 https://github.com/tensorflow/models/tree/master/research/slim/datasets
@@ -30,14 +32,14 @@ import dataset_utils
 flags = tf.app.flags
 # TODO: set parameters
 flags.DEFINE_string('dataset_root_path',
-					'/home/ansheng/cv_strategy/porn_detect/dataset/DATASET_zyb_v1/dataset_mini',
+					'',
 					'The dataset root directory containing a set of subdirectories representing' +
 					'class names. Each subdirectory should contain PNG or JPG encoded images.')
 flags.DEFINE_string('tfrecord_save_path',
-					'/home/ansheng/cv_strategy/porn_detect/cnn_tf/classification_by_slim/tfrecord',
+					'tfrecord',
 					'The directory to save the tfrecord files')
 flags.DEFINE_string('dataset_base_name',
-					'zyb_v1_mini',
+					'dataset_v1',
 					'Give a base name for the dataset')
 flags.DEFINE_integer('train_num_shards', 5,
 					'The number of shards per dataset split, ' +

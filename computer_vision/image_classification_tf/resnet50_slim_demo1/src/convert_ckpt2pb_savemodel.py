@@ -15,6 +15,10 @@ import os
 import tensorflow as tf
 import resnet_v1_50_model
 
+# TODO: import the model you want to convert
+from net.resnet import resnet_v1_50_model as model
+#from net.resnet import resnet_v1_20_model as model
+
 flags = tf.app.flags
 flags.DEFINE_string('action', None, 'command action: print or convert')
 flags.DEFINE_string('checkpoint_path', None,
@@ -96,7 +100,7 @@ def freeze_graph(input_checkpoint, output_graph_path):
         num_classes = 2
     
         # build model correlation op: logits, classed, loss, acc
-        classification_model = resnet_v1_50_model.Model(num_classes=num_classes)
+        classification_model = model.Model(num_classes=num_classes)
         inputs_dict = classification_model.preprocess(orignal_inputs, is_training)
         predict_dict = classification_model.predict(inputs_dict)
         postprocessed_dict = classification_model.postprocess(predict_dict)
