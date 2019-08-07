@@ -2,8 +2,12 @@
 """
 Created on Tue Nov  6 15:35:27 2018
 
-测试程序示例：
-对模型进行准召测试
+一个多功能性能测试程序demo
+
+与predict_img_dir.py仅仅对指定目录下图像进行预测不同
+recall_precision_test.py会对模型进行准召测试
+绘制准召变化曲线，计算曲线下面积
+从多个角度为模型比较和选择提供参考
 
 @author: zyb_as
 """
@@ -28,15 +32,14 @@ flags.DEFINE_string('positive_img_dir', ' ',
                     'Path to positive images (directory).')
 flags.DEFINE_string('negative_img_dir', ' ',
                     'Path to negative images (directory).')
-flags.DEFINE_string('output_dir',
-                    './head_rp_test',
+flags.DEFINE_string('output_dir', './rp_test',
                     'Directory to recall precision test result output file.')
 flags.DEFINE_string('gpu_device', '0', 'Specify which gpu to be used')
 
 FLAGS = flags.FLAGS
 
 
-# TODO: 针对不同问题，预测函数需要进行简单修改
+# TODO: 针对不同问题，预测函数需要进行简单修改，下面是两个示例
 def detect(model, image_path, threshold):
     image_src = cv2.imread(image_path)
     # use different strategy for different size
