@@ -4,11 +4,10 @@ Created on Thu Oct 11 17:44:31 2018
 
 Preprocessing images and do data augmentation
 
-@author: zyb_as
-
 Copied and Modified from:
     https://github.com/tensorflow/models/blob/master/research/slim/
     preprocessing/vgg_preprocessing.py
+@author: zyb_as
 """
 
 import math
