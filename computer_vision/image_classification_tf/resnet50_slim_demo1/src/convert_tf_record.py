@@ -167,8 +167,8 @@ def _convert_dataset(split_name, filenames, class_names_to_ids):
 
             try:
                 #tf_example = dataset_utils.get_tf_example_RGB(filenames[i], class_id)
-                #tf_example = dataset_utils.get_tf_example_RGB_RESIZE2(filenames[i], class_id, _ZOOM_SIZE)
-                tf_example = dataset_utils.get_tf_example_RGB_RESIZE(filenames[i], class_id, _ZOOM_SIZE)
+                tf_example = dataset_utils.get_tf_example_RGB_RESIZE2(filenames[i], class_id, _ZOOM_SIZE)
+                #tf_example = dataset_utils.get_tf_example_RGB_RESIZE(filenames[i], class_id, _ZOOM_SIZE)
             except Exception, e:
                 print("error occur! img {} with error: {}".format(filenames[i], repr(e)))
                 error_count += 1
