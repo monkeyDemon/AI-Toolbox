@@ -19,8 +19,8 @@ import tensorflow as tf
 import data_provider
 
 # TODO: import the model you want to convert
-from net.resnet import resnet_v1_50_model as model
-#from net.resnet import resnet_v1_20_model as model
+#from net.resnet import resnet_v1_50_model as model
+from net.resnet import resnet_v1_20_model as model
 
 
 slim = tf.contrib.slim
@@ -31,8 +31,9 @@ flags.DEFINE_string('tf_record_dir',
 flags.DEFINE_string('checkpoint_path', 
                     'model_zoo/resnet_v1_50.ckpt', 
                     'Path to pretrained ResNet-50 model.')
-flags.DEFINE_boolean('train_from_scratch', True, 
-    'train from scratch on imagenet pretrained model or continue training on previous model')
+flags.DEFINE_string('train_mode', 
+                    'scratch', 
+                    'train mode: scratch, imagenet or continue')
 flags.DEFINE_string('label_path',
                     'tfrecord/labels.txt',
                     'Path to label file.')
@@ -74,7 +75,7 @@ def main(_):
 
     model_ckpt_path = FLAGS.checkpoint_path # Path to the pretrained model
     model_save_dir = FLAGS.log_dir  # Path to the model.ckpt-(num_steps) will be saved
-    train_from_scratch = FLAGS.train_from_scratch # train from scratch on imagenet pretrained model or continue training on previous model
+    train_mode = FLAGS.train_mode  # train from scratch or finetune on imagenet pretrained model or continue training on previous model
     tensorboard_summary_dir = os.path.join(model_save_dir, 'tensorboard_summary')
     tf_record_dir = FLAGS.tf_record_dir
     batch_size = FLAGS.batch_size
@@ -125,22 +126,27 @@ def main(_):
         train_step = optimizer.minimize(loss, global_step)
     
     # init Saver to restore model
-    if train_from_scratch:
-        # if train from imagenet pretrained model, exclude the last classification layer
-        checkpoint_exclude_scopes = 'Logits'
-        exclusions = [scope.strip() for scope in checkpoint_exclude_scopes.split(',')]
-    else:   
-        # if continue training, just restore the whole model
-        exclusions = []
-    variables_to_restore = []
-    for var in slim.get_model_variables():
-        excluded = False
-        for exclusion in exclusions:
-            if var.op.name.startswith(exclusion):
-                excluded = True
-        if not excluded:
-            variables_to_restore.append(var)
-    saver_restore = tf.train.Saver(var_list=variables_to_restore)
+    if train_mode == 'scratch':
+        pass
+    else:
+        if train_mode == 'imagenet':
+            # if train from imagenet pretrained model, exclude the last classification layer
+            checkpoint_exclude_scopes = 'Logits'
+            exclusions = [scope.strip() for scope in checkpoint_exclude_scopes.split(',')]
+        elif train_mode == 'continue':
+            # if continue training, just restore the whole model
+            exclusions = []
+        else:
+            raise RuntimeError("train_mode error")
+        variables_to_restore = []
+        for var in slim.get_model_variables():
+            excluded = False
+            for exclusion in exclusions:
+                if var.op.name.startswith(exclusion):
+                    excluded = True
+            if not excluded:
+                variables_to_restore.append(var)
+        saver_restore = tf.train.Saver(var_list=variables_to_restore)
 
     # init Saver to save model
     saver = tf.train.Saver(tf.global_variables())
@@ -154,8 +160,9 @@ def main(_):
     with tf.Session(config=config) as sess:
         sess.run(init)
         
-        # Load the pretrained checkpoint file xxx.ckpt
-        saver_restore.restore(sess, model_ckpt_path)
+        if train_mode == 'imagenet' or train_mode == 'continue':
+            # Load the pretrained checkpoint file xxx.ckpt
+            saver_restore.restore(sess, model_ckpt_path)
         
         total_batch_num = 0
         total_best_acc = 0
