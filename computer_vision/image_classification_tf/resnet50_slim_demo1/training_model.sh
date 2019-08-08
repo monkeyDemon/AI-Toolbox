@@ -3,19 +3,27 @@
 # train script
 train_script="src/train.py"
 
+# train mode: 'scratch', 'imagenet' or 'continue'
+# 'scratch' means train from scratch without pretrained model.
+# 'imagenet' means fine tune on imagenet pretrained model.
+# 'continue' means continue training on our previous model
+train_mode='scratch'
+
+# Path to pretrained ResNet-50 model. need when train_mode='imagenet' or 'continue'
+# the imagenet pretrained model can be download at: 
+# https://github.com/tensorflow/models/tree/master/research/slim#Pretrained
+checkpoint_path="model_zoo/resnet_v1_50.ckpt"
+
 # Directory to tfrecord files.
 tf_record_dir="./tfrecord"
-# Path to pretrained ResNet-50 model.
-# you can download pretrained model here https://github.com/tensorflow/models/tree/master/research/slim
-checkpoint_path="path to pretrained model/resnet_v1_50.ckpt"
-# train from scratch on imagenet pretrained model or continue training on previous model
-train_from_scratch=True
 # Path to label file.
 label_path="./tfrecord/labels.txt"
+
 # Path to log directory.
 log_dir="./log/train_tf_log"
 # Path to log file.
 log_file="./log/training_log.out"
+
 # Initial learning rate.
 learning_rate=0.00001
 # Learning rate decay factor.
@@ -40,7 +48,7 @@ echo "run ${train_script}"
 nohup python ${train_script} \
     --tf_record_dir=${tf_record_dir} \
     --checkpoint_path=${checkpoint_path} \
-    --train_from_scratch=${train_from_scratch} \
+    --train_mode=${train_mode} \
     --label_path=${label_path} \
     --log_dir=${log_dir} \
     --learning_rate=${learning_rate} \
