@@ -653,6 +653,6 @@ def augmentation(image, img_shape, is_training):
         preprocessed inputs:
     """ 
     if is_training:
-        return augmentation_for_train(image, img_shape)
+        return augmentation_for_train2(image, img_shape)
     else:
-        return augmentation_for_eval(image, img_shape)
+        return augmentation_for_eval2(image, img_shape)
