@@ -42,6 +42,8 @@ def get_img_by_url(url):
 def detect(model, image, threshold):
     # use different strategy for different size
     shape = image.shape
+    width = shape[1]
+    height = shape[0]
     if len(shape) == 2: 
         # gray
         image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
@@ -73,7 +75,7 @@ def detect(model, image, threshold):
         ed = st + width
         preprocess_image[:,st:ed,:] = image
 
-    pred_label = model.predict([image])[0]
+    pred_label = model.predict([preprocess_image])[0]
     is_hit = True if pred_label[1] > threshold else False  # TODO: need to be modify according to actual situation
     return is_hit, pred_label
 
