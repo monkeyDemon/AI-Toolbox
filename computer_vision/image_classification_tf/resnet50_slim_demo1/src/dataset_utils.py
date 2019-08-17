@@ -103,11 +103,11 @@ def process_image_resize2(image, resize):
     width, height = image.size
     if resize is not None:
         if width > height:
-            width = resize
             height = int(height * resize / width) 
+            width = resize
         else:
-            height = resize
             width = int(width * resize / height)
+            height = resize
         image = image.resize((width, height), Image.ANTIALIAS)
     return image
 
