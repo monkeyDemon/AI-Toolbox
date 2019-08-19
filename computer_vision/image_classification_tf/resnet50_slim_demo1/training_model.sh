@@ -3,11 +3,10 @@
 # train script
 train_script="src/train.py"
 
-# train mode: 'scratch', 'imagenet' or 'continue'
-# 'scratch' means train from scratch without pretrained model.
+# train mode: 'imagenet' or 'continue'
 # 'imagenet' means fine tune on imagenet pretrained model.
 # 'continue' means continue training on our previous model
-train_mode='scratch'
+train_mode='imagenet'
 
 # Path to pretrained ResNet-50 model. need when train_mode='imagenet' or 'continue'
 # the imagenet pretrained model can be download at: 
