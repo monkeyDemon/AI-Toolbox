@@ -3,7 +3,8 @@
 # train script
 train_script="src/train.py"
 
-# train mode: 'imagenet' or 'continue'
+# train mode: 'scratch' or 'imagenet' or 'continue'
+# 'scratch' means train from scratch without pretrained model.
 # 'imagenet' means fine tune on imagenet pretrained model.
 # 'continue' means continue training on our previous model
 train_mode='imagenet'
@@ -45,9 +46,9 @@ gpu_device='0'
 echo "run ${train_script}"
 
 nohup python ${train_script} \
-    --tf_record_dir=${tf_record_dir} \
-    --checkpoint_path=${checkpoint_path} \
     --train_mode=${train_mode} \
+    --checkpoint_path=${checkpoint_path} \
+    --tf_record_dir=${tf_record_dir} \
     --label_path=${label_path} \
     --log_dir=${log_dir} \
     --learning_rate=${learning_rate} \
