@@ -20,6 +20,7 @@ python version: python 3.5
 
 import os
 import sys
+import xlrd
 import argparse, textwrap
 import requests
 import numpy as np
@@ -30,11 +31,12 @@ parser = argparse.ArgumentParser(description = 'manual to this script',
         command example:
         python %(prog)s --file_type='npy' --file_path='test.npy' --save_dir='./download'
         python %(prog)s --file_type='txt' --file_path='test.txt' --save_dir='./download' --splitter='\\t' --fields_num=1 --url_field_idx=0
+        python %(prog)s --file_type='txt' --file_path='test.txt' --save_dir='./download' --fields_num=1 --url_field_idx=0
         use "python %(prog)s --help" for more information '''),
         formatter_class = argparse.RawTextHelpFormatter)
 parser.add_argument('--file_type', type = str, default = None,
         help = textwrap.dedent('''\
-        value: \'npy\' or \'txt\'
+        value: \'npy\' or \'txt\' or \'xlsx\'
         type of the file storing the url list.'''))
 parser.add_argument('--file_path', type = str, default = None,
         help = 'the path of the file storing the url list')
@@ -127,6 +129,55 @@ def download_from_npy(npy_file, save_dir):
         _get_img_by_url(url, save_dir)
 
 
+def download_from_xlsx(url_file, save_dir, fields_num = 1, url_field_idx = 0):
+    if os.path.exists(save_dir):
+        print("warning! save_dir has exists, please check!")
+    else:
+        os.mkdir(save_dir)
+
+    data = xlrd.open_workbook(url_file)
+    #获取sheet 此处有图注释（见图1）
+    table = data.sheet_by_name('Sheet1')
+     
+    #获取总行数
+    nrows = table.nrows 
+    #获取总列数
+    ncols = table.ncols
+    
+    if ncols != fields_num:
+        print("ERROR: fields_num not right.")
+        return
+
+    failure_count = 0
+    failed_urls = []
+    for row in range(nrows):
+        #if row > 1000:
+        #    break
+        
+        url = table.cell(row,url_field_idx).value
+        url = str(url)
+
+        print(url)
+        try:
+            _get_img_by_url(url, save_dir)
+        except:
+            failure_count += 1
+            failed_urls.append(url)
+    
+    print("\nfailed record:")
+    print(failure_count)
+    print(failed_urls)
+
+    # retry the download failed urls
+    print("\nretry the download failed urls...")
+    for url in failed_urls:
+        try:
+            print(url)
+            _get_img_by_url(url, save_dir)
+        except:
+            failure_count += 1
+
+
 
 if __name__ == "__main__":
     # get options
@@ -142,6 +193,10 @@ if __name__ == "__main__":
         fields_num = args.fields_num
         url_field_idx = args.url_field_idx
         download_from_txt(file_path, save_dir, splitter, fields_num, url_field_idx)
+    elif file_type == 'xlsx':
+        fields_num = args.fields_num
+        url_field_idx = args.url_field_idx
+        download_from_xlsx(file_path, save_dir, fields_num, url_field_idx)
     else:
         print('Error use of --file_type! Please use -h to check')
         sys.exit()
