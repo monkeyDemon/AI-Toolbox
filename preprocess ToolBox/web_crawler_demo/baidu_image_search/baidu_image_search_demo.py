@@ -40,7 +40,7 @@ from selenium import webdriver
 # TODO: set parameters
 # These two parameters needs to be modified according to your actual situation.
 chrome_driver_path = 'C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe'
-base_url = 'https://raw.githubusercontent.com/wiki/***/seed_imgs/'
+base_url = 'https://***/***/seed_imgs/'
 
 home_page = 'https://graph.baidu.com/pcpage/index?tpl_from=pc'
 seed_imgs_dir = 'seed_imgs'
