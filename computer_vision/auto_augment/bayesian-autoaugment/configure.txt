@@ -1,0 +1,3 @@
+Server|ip:127.0.0.1|port:8101|record_dir:'record/polices_search_record.txt'
+Client|ip:127.0.0.1|port:8102|gpu:1|record_dir:'record/client0'
+Client|ip:127.0.0.1|port:8103|gpu:4|record_dir:'record/client1'
