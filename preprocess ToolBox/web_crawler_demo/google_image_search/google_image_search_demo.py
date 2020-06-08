@@ -196,7 +196,7 @@ def load_keywords_list(keyword_path):
 
 if __name__ == "__main__":
     # 使用示例：
-    keyword_path = 'keywords_list_temp.txt'
+    keyword_path = 'keywords_list.txt'
     max_page = 10
     
     keyword_list = load_keywords_list(keyword_path)

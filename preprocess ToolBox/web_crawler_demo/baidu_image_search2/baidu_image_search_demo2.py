@@ -20,7 +20,7 @@ https://image.baidu.com/
 下载链接（需选择对应版本） http://chromedriver.storage.googleapis.com/index.html
 3.运行本程序，耐心等待
 
-python version: python3.5
+python version: python3
 @author: zyb_as
 """
 import os
@@ -132,7 +132,8 @@ def download_images(url_list, cur_save_dir):
             
             img_name = img_url.split('/')[-1]
             save_path = os.path.join(cur_save_dir, img_name)
-            cv2.imwrite(save_path, img)
+            #cv2.imwrite(save_path, img)    # 这样保存由于中文路径会出问题
+            cv2.imencode(".jpg",img)[1].tofile(save_path)
         except Exception as e:
             print("ERROR: download img corruption.")
 
@@ -165,6 +166,6 @@ def search_imgs(keyword_list, max_page = 30):
 
 if __name__ == "__main__":
     # 使用示例：
-    keyword_list = ['T-shirt', 'skirt']
-    max_page = 30
+    keyword_list = ['汉堡', '薯条', '可乐']
+    max_page = 10
     search_imgs(keyword_list, max_page)        
